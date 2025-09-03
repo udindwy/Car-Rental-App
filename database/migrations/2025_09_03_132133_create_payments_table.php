@@ -14,11 +14,17 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
-            $table->decimal('amount', 12, 2);
+
+            // PASTIKAN KOLOM INI BENAR
             $table->enum('method', ['cash', 'transfer', 'gateway']);
-            $table->enum('status', ['unpaid', 'paid', 'failed', 'refunded'])->default('unpaid');
-            $table->string('reference')->nullable();
+
+            $table->decimal('amount', 12, 2);
+
+            // PASTIKAN KOLOM INI JUGA BENAR
+            $table->enum('status', ['unpaid', 'paid', 'failed', 'refunded']);
+
             $table->timestamp('paid_at')->nullable();
+            $table->string('reference')->nullable();
             $table->timestamps();
         });
     }
