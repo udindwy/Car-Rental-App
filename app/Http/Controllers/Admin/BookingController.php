@@ -19,28 +19,8 @@ class BookingController extends Controller
      */
     public function index()
     {
-        // Mengambil semua data booking dengan relasi untuk efisiensi query
         $bookings = Booking::with(['user', 'vehicle'])->latest()->paginate(10);
         return view('admin.bookings.index', compact('bookings'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     * (Fitur ini bisa dikembangkan nanti untuk membuat pesanan manual dari admin)
-     */
-    public function create()
-    {
-        // Logika untuk halaman create bisa ditambahkan di sini
-        return redirect()->route('admin.bookings.index')->with('info', 'Fitur Tambah Pemesanan Manual belum diimplementasikan.');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        // Logika untuk menyimpan booking baru dari admin
-        return redirect()->route('admin.bookings.index');
     }
 
     /**
@@ -48,11 +28,10 @@ class BookingController extends Controller
      */
     public function edit(Booking $booking)
     {
-        // Mengambil data yang dibutuhkan untuk dropdown di form edit
+        $booking->load('payments'); // Memuat riwayat pembayaran
         $users = User::where('role', 'customer')->get();
-        $vehicles = Vehicle::all(); // Mengambil semua mobil agar bisa diganti
+        $vehicles = Vehicle::all();
         $branches = Branch::all();
-
         return view('admin.bookings.edit', compact('booking', 'users', 'vehicles', 'branches'));
     }
 
@@ -61,7 +40,6 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
-        // Validasi data yang masuk, terutama status
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -71,9 +49,7 @@ class BookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Update data booking
         $booking->update($request->all());
-
         return redirect()->route('admin.bookings.index')->with('success', 'Data pemesanan berhasil diperbarui.');
     }
 
@@ -91,12 +67,8 @@ class BookingController extends Controller
      */
     public function generateInvoice(Booking $booking)
     {
-        // Eager load relasi untuk ditampilkan di invoice
         $booking->load('user', 'vehicle.brand');
-
         $pdf = Pdf::loadView('admin.bookings.invoice', compact('booking'));
-
-        // Tampilkan PDF di browser
         return $pdf->stream('invoice-' . $booking->id . '.pdf');
     }
 
@@ -111,10 +83,7 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:255',
         ]);
 
-        // 1. Ubah status booking menjadi 'cancelled'
         $booking->update(['status' => 'cancelled']);
-
-        // 2. Buat catatan pembayaran baru untuk refund
         $booking->payments()->create([
             'amount' => $request->refund_amount,
             'method' => $request->refund_method,
@@ -122,8 +91,43 @@ class BookingController extends Controller
             'paid_at' => now(),
             'reference' => $request->notes,
         ]);
+        return redirect()->route('admin.bookings.index')->with('success', 'Pesanan berhasil dibatalkan dan refund dicatat.');
+    }
 
-        return redirect()->route('admin.bookings.index')
-            ->with('success', 'Pesanan berhasil dibatalkan dan refund dicatat.');
+    /**
+     * Store a new payment for the specified booking.
+     */
+    public function storePayment(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'payment_amount' => 'required|numeric|min:0',
+            'payment_method' => ['required', Rule::in(['cash', 'transfer', 'gateway'])],
+            'notes' => 'nullable|string|max:255',
+        ]);
+
+        // 1. Catat transaksi pembayaran baru
+        $booking->payments()->create([
+            'amount' => $request->payment_amount,
+            'method' => $request->payment_method,
+            'status' => 'paid', // Pembayaran masuk selalu dianggap 'paid'
+            'paid_at' => now(),
+            'reference' => $request->notes,
+        ]);
+
+        // 2. Hitung ulang dan update status pembayaran di booking
+        $totalPaid = $booking->payments()->where('status', 'paid')->sum('amount');
+        $totalRefunded = $booking->payments()->where('status', 'refunded')->sum('amount');
+        $netPaid = $totalPaid - $totalRefunded;
+
+        if ($netPaid >= $booking->grand_total) {
+            $booking->payment_status = 'paid';
+        } elseif ($netPaid > 0) {
+            $booking->payment_status = 'partial';
+        } else {
+            $booking->payment_status = 'unpaid';
+        }
+        $booking->save();
+
+        return redirect()->back()->with('success', 'Pembayaran berhasil dicatat.');
     }
 }

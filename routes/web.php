@@ -6,8 +6,10 @@ use App\Http\Controllers\ProfileController;
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\FeatureController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -71,6 +73,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('bookings/{booking}/invoice', [BookingController::class, 'generateInvoice'])->name('bookings.invoice');
 
     Route::post('bookings/{booking}/refund', [BookingController::class, 'processRefund'])->name('bookings.refund');
+
+    Route::resource('payments', PaymentController::class)->only(['index']);
+    Route::post('bookings/{booking}/payments', [BookingController::class, 'storePayment'])->name('bookings.payments.store');
+
+    Route::resource('coupons', CouponController::class);
 });
 
 // Authentication Routes
