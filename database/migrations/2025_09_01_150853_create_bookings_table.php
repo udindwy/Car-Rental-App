@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('discount_total', 12, 2)->default(0);
             $table->decimal('grand_total', 12, 2);
             $table->enum('status', ['pending', 'confirmed', 'on_rent', 'completed', 'cancelled'])->default('pending');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

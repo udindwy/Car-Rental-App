@@ -10,7 +10,11 @@ use App\Models\Category;
 use App\Models\PricingRule;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\VehicleBlackout;
+use App\Exports\BlackoutsExport;
+use App\Imports\BlackoutsImport;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreVehicleRequest;
 
@@ -145,5 +149,61 @@ class VehicleController extends Controller
     {
         $rule->delete();
         return redirect()->back()->with('success', 'Aturan harga berhasil dihapus.');
+    }
+
+    // app/Http/Controllers/Admin/VehicleController.php
+
+    // Jangan lupa tambahkan `use App\Models\VehicleBlackout;` di bagian atas
+
+    public function availability(Vehicle $vehicle)
+    {
+        $blackouts = $vehicle->blackouts()->latest()->get();
+        return view('admin.vehicles.availability', compact('vehicle', 'blackouts'));
+    }
+
+    public function storeBlackout(Request $request, Vehicle $vehicle)
+    {
+        $request->validate([
+            'start_datetime' => 'required|date',
+            'end_datetime' => 'required|date|after_or_equal:start_datetime',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $vehicle->blackouts()->create($request->all());
+
+        return redirect()->back()->with('success', 'Tanggal berhasil diblokir.');
+    }
+
+    public function destroyBlackout(VehicleBlackout $blackout)
+    {
+        $blackout->delete();
+        return redirect()->back()->with('success', 'Blokir tanggal berhasil dihapus.');
+    }
+
+    public function exportBlackouts()
+    {
+        return Excel::download(new BlackoutsExport, 'daftar-jadwal-blokir.csv');
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.vehicles.import');
+    }
+
+    public function importBlackouts(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt',
+        ]);
+
+        try {
+            Excel::import(new BlackoutsImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            // Handle validation failures, redirect back with errors
+            return redirect()->back()->with('import_errors', $failures);
+        }
+
+        return redirect()->back()->with('success', 'Data jadwal berhasil diimpor.');
     }
 }

@@ -3,14 +3,19 @@
         {{ __('Dashboard') }}
     </x-slot>
 
-    <div class="mb-6 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-white shadow-lg">
-        <h2 class="text-2xl font-bold">Selamat Datang, {{ Auth::user()->name }}!</h2>
+    <!-- Kartu Selamat Datang -->
+    <div class="mb-8 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-white shadow-lg">
+        <h2 class="text-3xl font-bold">Selamat Datang, {{ Auth::user()->name }}!</h2>
         <p class="mt-1 text-blue-100">Ini adalah ringkasan performa rental mobil Anda.</p>
     </div>
 
-        <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="flex items-center rounded-lg bg-white p-4 shadow-md">
-                <div class="rounded-full bg-blue-100 p-3 text-blue-600">
+    <!-- PERBAIKAN DI SINI: Struktur Grid diperbaiki -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- KPI: Total Pendapatan -->
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="flex items-center border-b border-gray-200 bg-gray-50 p-4">
+                <div
+                    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-600">
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -19,11 +24,16 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500">Total Pendapatan</p>
-                    <p class="text-xl font-bold text-gray-800">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
+                    <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
                 </div>
             </div>
-            <div class="flex items-center rounded-lg bg-white p-4 shadow-md">
-                <div class="rounded-full bg-green-100 p-3 text-green-600">
+        </div>
+
+        <!-- KPI: Total Pemesanan -->
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="flex items-center border-b border-gray-200 bg-gray-50 p-4">
+                <div
+                    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -32,11 +42,16 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500">Total Pemesanan</p>
-                    <p class="text-xl font-bold text-gray-800">{{ $totalBookings }}</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $totalBookings }}</p>
                 </div>
             </div>
-            <div class="flex items-center rounded-lg bg-white p-4 shadow-md">
-                <div class="rounded-full bg-amber-100 p-3 text-amber-600">
+        </div>
+
+        <!-- KPI: Tingkat Okupansi -->
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="flex items-center border-b border-gray-200 bg-gray-50 p-4">
+                <div
+                    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -45,11 +60,16 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500">Tingkat Okupansi</p>
-                    <p class="text-xl font-bold text-gray-800">{{ number_format($occupancyRate, 1) }}%</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ number_format($occupancyRate, 1) }}%</p>
                 </div>
             </div>
-            <div class="flex items-center rounded-lg bg-white p-4 shadow-md">
-                <div class="rounded-full bg-red-100 p-3 text-red-600">
+        </div>
+
+        <!-- KPI: Pesanan Hari Ini -->
+        <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div class="flex items-center border-b border-gray-200 bg-gray-50 p-4">
+                <div
+                    class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                         stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -58,66 +78,98 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm text-gray-500">Pesanan Hari Ini</p>
-                    <p class="text-xl font-bold text-gray-800">{{ $todayBookings }}</p>
+                    <p class="text-2xl font-bold text-gray-800">{{ $todayBookings }}</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div class="rounded-lg bg-white p-6 shadow-md">
-                <h3 class="mb-4 text-lg font-semibold text-gray-700">Pemesanan 7 Hari Terakhir</h3>
-                <canvas id="bookingsChart"></canvas>
-            </div>
-
-            <div class="rounded-lg bg-white p-6 shadow-md">
-                <h3 class="mb-4 text-lg font-semibold text-gray-700">Aktivitas Terbaru</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center">
-                        <div class="ml-4">
-                            <p class="font-medium text-gray-800">Booking Baru: Avanza oleh Budi</p>
-                            <p class="text-sm text-gray-500">Dibuat pada 02 Sep 2025</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center border-t pt-4">
-                        <div class="ml-4">
-                            <p class="font-medium text-gray-800">Mobil Baru Ditambahkan: Innova Reborn</p>
-                            <p class="text-sm text-gray-500">Dibuat pada 01 Sep 2025</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Grafik dan Aktivitas Terbaru -->
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">Pemesanan 7 Hari Terakhir</h3>
+            <canvas id="bookingsChart"></canvas>
         </div>
 
-        @push('scripts')
-            <script>
-                const ctx = document.getElementById('bookingsChart');
-                if (ctx) {
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: @json($chartLabels),
-                            datasets: [{
-                                label: 'Jumlah Pemesanan',
-                                data: @json($chartData),
-                                fill: false,
-                                borderColor: '#10b981',
-                                tension: 0.1,
-                                backgroundColor: '#10b981',
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        precision: 0
-                                    }
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">Aktivitas Terbaru</h3>
+            <div class="space-y-4">
+                @forelse ($activities as $activity)
+                    <div class="flex items-start">
+                        <!-- Ikon berdasarkan tipe aktivitas -->
+                        <div class="flex-shrink-0">
+                            @if ($activity instanceof \App\Models\Booking)
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-1.125 0-2.25.9-2.25 2.25v11.25c0 1.243 1.009 2.25 2.25 2.25H18a2.25 2.25 0 002.25-2.25V16.5" />
+                                    </svg>
+                                </div>
+                            @elseif ($activity instanceof \App\Models\Vehicle)
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 003.375-3.375h1.5a1.125 1.125 0 011.125 1.125v-1.5c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 003.375 3.375v1.875a2.25 2.25 0 01-2.25 2.25H5.625a2.25 2.25 0 01-2.25-2.25z" />
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="ml-4">
+                            <p class="font-medium text-gray-800">
+                                @if ($activity instanceof \App\Models\Booking)
+                                    Booking Baru: {{ $activity->vehicle->name ?? 'N/A' }} oleh
+                                    {{ $activity->user->name ?? 'N/A' }}
+                                @elseif ($activity instanceof \App\Models\Vehicle)
+                                    Mobil Baru Ditambahkan: {{ $activity->name }}
+                                @endif
+                            </p>
+                            <p class="text-sm text-gray-500" title="{{ $activity->created_at->format('d M Y H:i:s') }}">
+                                {{ $activity->created_at->diffForHumans() }}
+                            </p>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-500">Belum ada aktivitas terbaru.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+        <script>
+            const ctx = document.getElementById('bookingsChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: @json($chartLabels),
+                        datasets: [{
+                            label: 'Jumlah Pemesanan',
+                            data: @json($chartData),
+                            fill: false,
+                            borderColor: '#10b981',
+                            tension: 0.1,
+                            backgroundColor: '#10b981',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
                                 }
                             }
                         }
-                    });
-                }
-            </script>
-        @endpush
+                    }
+                });
+            }
+        </script>
+    @endpush
+
 </x-admin-layout>

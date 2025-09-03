@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -51,11 +52,25 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('branches', BranchController::class);
     Route::resource('features', FeatureController::class);
     Route::resource('vehicles', VehicleController::class);
-    
+
     Route::get('vehicles/{vehicle}/pricing', [VehicleController::class, 'pricing'])->name('vehicles.pricing');
     Route::post('vehicles/{vehicle}/pricing', [VehicleController::class, 'storePricing'])->name('vehicles.storePricing');
     Route::delete('pricing-rules/{rule}', [VehicleController::class, 'destroyPricing'])->name('pricing-rules.destroy');
 
+    Route::get('vehicles/{vehicle}/availability', [VehicleController::class, 'availability'])->name('vehicles.availability');
+    Route::post('vehicles/{vehicle}/blackouts', [VehicleController::class, 'storeBlackout'])->name('vehicles.blackouts.store');
+    Route::delete('blackouts/{blackout}', [VehicleController::class, 'destroyBlackout'])->name('blackouts.destroy');
+
+    Route::get('blackouts/export', [VehicleController::class, 'exportBlackouts'])->name('blackouts.export');
+
+    Route::get('blackouts/import', [VehicleController::class, 'showImportForm'])->name('blackouts.import.show');
+    Route::post('blackouts/import', [VehicleController::class, 'importBlackouts'])->name('blackouts.import.store');
+
+    Route::resource('bookings', BookingController::class);
+
+    Route::get('bookings/{booking}/invoice', [BookingController::class, 'generateInvoice'])->name('bookings.invoice');
+
+    Route::post('bookings/{booking}/refund', [BookingController::class, 'processRefund'])->name('bookings.refund');
 });
 
 // Authentication Routes

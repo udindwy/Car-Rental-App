@@ -46,24 +46,75 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <!-- LINK BARU DITAMBAHKAN DI SINI -->
-                                <a href="{{ route('admin.vehicles.pricing', $vehicle) }}"
-                                    class="text-green-600 hover:text-green-900 mr-4">Atur Harga</a>
+                                <div class="flex justify-end space-x-2">
+                                    <!-- Tombol Ketersediaan -->
+                                    <a href="{{ route('admin.vehicles.availability', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 transition">
+                                        Ketersediaan
+                                    </a>
 
-                                <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                <form action="{{ route('admin.vehicles.destroy', $vehicle) }}" method="POST"
-                                    class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mobil ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
-                                </form>
+                                    <!-- Tombol Harga -->
+                                    <a href="{{ route('admin.vehicles.pricing', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-green-500 hover:bg-green-600 transition">
+                                        Atur Harga
+                                    </a>
+
+                                    <!-- Tombol Edit -->
+                                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
+                                        Edit
+                                    </a>
+
+                                    <!-- Tombol Hapus -->
+                                    <form action="{{ route('admin.vehicles.destroy', $vehicle) }}" method="POST"
+                                        class="inline-flex"
+                                        onsubmit="return confirm('Yakin ingin menghapus mobil ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-500 hover:bg-red-600 transition">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Belum ada data mobil.
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end space-x-2">
+                                    <!-- Tombol Ketersediaan -->
+                                    <a href="{{ route('admin.vehicles.availability', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 transition">
+                                        Ketersediaanh
+                                    </a>
+
+                                    <!-- Tombol Harga -->
+                                    <a href="{{ route('admin.vehicles.pricing', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-green-500 hover:bg-green-600 transition">
+                                        Atur Harga
+                                    </a>
+
+                                    <!-- Tombol Edit -->
+                                    <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
+                                        Edit
+                                    </a>
+
+                                    <!-- Tombol Hapus -->
+                                    <form action="{{ route('admin.vehicles.destroy', $vehicle) }}" method="POST"
+                                        class="inline-flex"
+                                        onsubmit="return confirm('Yakin ingin menghapus mobil ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-500 hover:bg-red-600 transition">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
+
                         </tr>
                     @endforelse
                 </tbody>

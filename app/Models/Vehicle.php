@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vehicle extends Model
+
 {
     use HasFactory;
 
@@ -27,6 +28,8 @@ class Vehicle extends Model
         'status',
     ];
 
+
+
     // --- Definisikan relasi yang sudah ada ---
     public function brand()
     {
@@ -45,9 +48,13 @@ class Vehicle extends Model
         return $this->belongsToMany(Feature::class);
     }
 
-    // --- TAMBAHKAN METHOD RELASI BARU INI ---
     public function pricingRules()
     {
         return $this->hasMany(PricingRule::class);
+    }
+
+    public function blackouts()
+    {
+        return $this->hasMany(VehicleBlackout::class);
     }
 }
