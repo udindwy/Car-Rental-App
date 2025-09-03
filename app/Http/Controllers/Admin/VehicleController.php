@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Vehicle;
-use App\Models\Branch;
 use App\Models\Brand;
-use App\Models\Category;
+use App\Models\Branch;
 use App\Models\Feature;
-use App\Http\Requests\StoreVehicleRequest;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Vehicle;
+use App\Models\Category;
+use App\Models\PricingRule;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreVehicleRequest;
 
 class VehicleController extends Controller
 {
@@ -112,5 +114,36 @@ class VehicleController extends Controller
 
         $vehicle->delete(); // Hapus record dari database
         return redirect()->route('admin.vehicles.index')->with('success', 'Data mobil berhasil dihapus.');
+    }
+
+    // app/Http/Controllers/Admin/VehicleController.php
+
+    // Jangan lupa tambahkan `use App\Models\PricingRule;` di bagian atas
+
+    public function pricing(Vehicle $vehicle)
+    {
+        $rules = $vehicle->pricingRules()->get();
+        return view('admin.vehicles.pricing', compact('vehicle', 'rules'));
+    }
+
+    public function storePricing(Request $request, Vehicle $vehicle)
+    {
+        $request->validate([
+            'type' => 'required|in:long_rent,date_range,weekend',
+            'percent_adjustment' => 'required|numeric',
+            'min_days' => 'nullable|required_if:type,long_rent|integer|min:2',
+            'start_date' => 'nullable|required_if:type,date_range|date',
+            'end_date' => 'nullable|required_if:type,date_range|date|after_or_equal:start_date',
+        ]);
+
+        $vehicle->pricingRules()->create($request->all());
+
+        return redirect()->back()->with('success', 'Aturan harga baru berhasil ditambahkan.');
+    }
+
+    public function destroyPricing(PricingRule $rule)
+    {
+        $rule->delete();
+        return redirect()->back()->with('success', 'Aturan harga berhasil dihapus.');
     }
 }

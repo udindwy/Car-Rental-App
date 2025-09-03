@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function index()
     {
         try {
-            // Hitung semua data KPI dari database
+            // Kalkulasi Data KPI
             $totalRevenue = Booking::where('status', 'completed')->sum('grand_total');
             $totalBookings = Booking::count();
             $activeVehicles = Vehicle::where('status', 'active')->count();
@@ -22,20 +22,21 @@ class DashboardController extends Controller
             $occupancyRate = ($totalVehicles > 0) ? ($vehiclesOnRent / $totalVehicles) * 100 : 0;
             $todayBookings = Booking::whereDate('created_at', today())->count();
 
-            // Siapkan data untuk grafik
+            // Data untuk Grafik
             $bookingsChart = Booking::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('count(*) as count')
             )
-                ->where('created_at', '>=', now()->subDays(6))
-                ->groupBy('date')
-                ->orderBy('date', 'asc')
-                ->get();
-
+            ->where('created_at', '>=', now()->subDays(6))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+            
             $chartLabels = $bookingsChart->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d M'));
             $chartData = $bookingsChart->pluck('count');
+
         } catch (QueryException $e) {
-            // Jika terjadi error (misal: tabel belum ada), siapkan data default
+            // Data Default jika terjadi error query
             $totalRevenue = 0;
             $totalBookings = 0;
             $activeVehicles = 0;
@@ -45,7 +46,7 @@ class DashboardController extends Controller
             $chartData = collect();
         }
 
-        // Kirim semua variabel ke view
+        // Kirim Semua Variabel ke View
         return view('admin.dashboard', compact(
             'totalRevenue',
             'totalBookings',

@@ -51,8 +51,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::resource('branches', BranchController::class);
     Route::resource('features', FeatureController::class);
     Route::resource('vehicles', VehicleController::class);
-
-    // Tambahkan resource route admin lainnya di sini
+    
+    Route::get('vehicles/{vehicle}/pricing', [VehicleController::class, 'pricing'])->name('vehicles.pricing');
+    Route::post('vehicles/{vehicle}/pricing', [VehicleController::class, 'storePricing'])->name('vehicles.storePricing');
+    Route::delete('pricing-rules/{rule}', [VehicleController::class, 'destroyPricing'])->name('pricing-rules.destroy');
 
 });
 
