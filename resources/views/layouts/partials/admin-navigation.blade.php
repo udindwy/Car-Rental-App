@@ -1,13 +1,17 @@
-<header class="bg-white shadow-sm flex items-center justify-between px-6 py-4">
+<!-- PERBAIKAN 2: Tambahkan class h-20 untuk menyamakan tinggi -->
+
+<header class="flex h-20 items-center justify-between border-b bg-white px-6 shadow-sm">
     <div class="flex items-center">
+        <!-- Tombol Hamburger (Mobile) -->
         <button @click="sidebarOpen = true" class="text-gray-600 focus:outline-none lg:hidden">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
         </button>
 
+        <!-- Tombol Hamburger (Desktop) -->
         <button @click="sidebarCollapsed = !sidebarCollapsed" class="hidden text-gray-600 focus:outline-none lg:block">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
         </button>
@@ -34,7 +38,6 @@
                     </div>
                 </button>
             </x-slot>
-
             <x-slot name="content">
                 <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
                 <form method="POST" action="{{ route('logout') }}">
@@ -45,4 +48,5 @@
             </x-slot>
         </x-dropdown>
     </div>
+
 </header>
