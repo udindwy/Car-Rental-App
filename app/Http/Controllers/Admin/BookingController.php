@@ -15,11 +15,40 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class BookingController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource with search functionality.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $bookings = Booking::with(['user', 'vehicle'])->latest()->paginate(10);
+        $query = Booking::with(['user', 'vehicle']);
+
+        // Filter berdasarkan kata kunci pencarian
+        $query->when($request->search, function ($q, $search) {
+            $q->where(function ($subQuery) use ($search) {
+                $subQuery->where('id', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('vehicle', function ($vehicleQuery) use ($search) {
+                        $vehicleQuery->where('name', 'like', "%{$search}%");
+                    });
+            });
+        });
+
+        // Filter berdasarkan status
+        $query->when($request->status, function ($q, $status) {
+            return $q->where('status', $status);
+        });
+
+        // Filter berdasarkan rentang tanggal sewa (pickup)
+        $query->when($request->start_date, function ($q, $date) {
+            return $q->whereDate('pickup_datetime', '>=', $date);
+        });
+        $query->when($request->end_date, function ($q, $date) {
+            return $q->whereDate('pickup_datetime', '<=', $date);
+        });
+
+        $bookings = $query->latest()->paginate(10)->withQueryString();
+
         return view('admin.bookings.index', compact('bookings'));
     }
 
@@ -28,10 +57,12 @@ class BookingController extends Controller
      */
     public function edit(Booking $booking)
     {
+        // Mengambil data yang dibutuhkan untuk dropdown di form edit
         $booking->load('payments'); // Memuat riwayat pembayaran
         $users = User::where('role', 'customer')->get();
         $vehicles = Vehicle::all();
         $branches = Branch::all();
+
         return view('admin.bookings.edit', compact('booking', 'users', 'vehicles', 'branches'));
     }
 
@@ -40,6 +71,7 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
+        // Validasi data yang masuk, terutama status
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -49,7 +81,9 @@ class BookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Update data booking
         $booking->update($request->all());
+
         return redirect()->route('admin.bookings.index')->with('success', 'Data pemesanan berhasil diperbarui.');
     }
 
@@ -67,31 +101,13 @@ class BookingController extends Controller
      */
     public function generateInvoice(Booking $booking)
     {
+        // Eager load relasi untuk ditampilkan di invoice
         $booking->load('user', 'vehicle.brand');
+
         $pdf = Pdf::loadView('admin.bookings.invoice', compact('booking'));
+
+        // Tampilkan PDF di browser
         return $pdf->stream('invoice-' . $booking->id . '.pdf');
-    }
-
-    /**
-     * Process a refund for the specified booking.
-     */
-    public function processRefund(Request $request, Booking $booking)
-    {
-        $request->validate([
-            'refund_amount' => 'required|numeric|min:0',
-            'refund_method' => ['required', Rule::in(['cash', 'transfer', 'gateway'])],
-            'notes' => 'nullable|string|max:255',
-        ]);
-
-        $booking->update(['status' => 'cancelled']);
-        $booking->payments()->create([
-            'amount' => $request->refund_amount,
-            'method' => $request->refund_method,
-            'status' => 'refunded',
-            'paid_at' => now(),
-            'reference' => $request->notes,
-        ]);
-        return redirect()->route('admin.bookings.index')->with('success', 'Pesanan berhasil dibatalkan dan refund dicatat.');
     }
 
     /**
@@ -109,7 +125,7 @@ class BookingController extends Controller
         $booking->payments()->create([
             'amount' => $request->payment_amount,
             'method' => $request->payment_method,
-            'status' => 'paid', // Pembayaran masuk selalu dianggap 'paid'
+            'status' => 'paid',
             'paid_at' => now(),
             'reference' => $request->notes,
         ]);
@@ -129,5 +145,32 @@ class BookingController extends Controller
         $booking->save();
 
         return redirect()->back()->with('success', 'Pembayaran berhasil dicatat.');
+    }
+
+    /**
+     * Process a refund for the specified booking.
+     */
+    public function processRefund(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'refund_amount' => 'required|numeric|min:0',
+            'refund_method' => ['required', Rule::in(['cash', 'transfer', 'gateway'])],
+            'notes' => 'nullable|string|max:255',
+        ]);
+
+        // 1. Ubah status booking menjadi 'cancelled'
+        $booking->update(['status' => 'cancelled']);
+
+        // 2. Buat catatan pembayaran baru untuk refund
+        $booking->payments()->create([
+            'amount' => $request->refund_amount,
+            'method' => $request->refund_method,
+            'status' => 'refunded',
+            'paid_at' => now(),
+            'reference' => $request->notes,
+        ]);
+
+        return redirect()->route('admin.bookings.index')
+            ->with('success', 'Pesanan berhasil dibatalkan dan refund dicatat.');
     }
 }
