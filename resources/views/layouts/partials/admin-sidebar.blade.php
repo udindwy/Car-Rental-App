@@ -100,25 +100,46 @@
                 <span class="ml-4 whitespace-nowrap">Pembayaran</span>
             </a>
 
+
+
             <!-- Kupon -->
             <a href="{{ route('admin.coupons.index') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
-                      {{ request()->routeIs('admin.coupons.*')
-                          ? 'bg-blue-600 font-semibold text-white'
-                          : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
+          {{ request()->routeIs('admin.coupons.*')
+              ? 'bg-blue-600 font-semibold text-white'
+              : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0
-                             3V18m-9-5.25h5.25M7.5 15h3M3.375
-                             5.25c-.621 0-1.125.504-1.125
-                             1.125v3.026a2.999 2.999 0
-                             010 5.198v3.026c0 .621.504
-                             1.125 1.125 1.125h17.25c.621
-                             0 1.125-.504 1.125-1.125v-3.026
-                             a2.999 2.999 0 010-5.198V6.375
-                             c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                 3V18m-9-5.25h5.25M7.5 15h3M3.375
+                 5.25c-.621 0-1.125.504-1.125
+                 1.125v3.026a2.999 2.999 0
+                 010 5.198v3.026c0 .621.504
+                 1.125 1.125 1.125h17.25c.621
+                 0 1.125-.504 1.125-1.125v-3.026
+                 a2.999 2.999 0 010-5.198V6.375
+                 c0-.621-.504-1.125-1.125-1.125H3.375z" />
                 </svg>
                 <span class="ml-4 whitespace-nowrap">Kupon & Promo</span>
             </a>
+
+            <!-- Layanan Tambahan -->
+            <a href="{{ route('admin.extras.index') }}"
+                class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
+          {{ request()->routeIs('admin.extras.*')
+              ? 'bg-blue-600 font-semibold text-white'
+              : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879
+               3.07.879 4.242 0 1.172-.879 1.172-2.303
+               0-3.182C13.536 12.219 12.768 12
+               12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303
+               0-3.182s2.9-.879 4.006 0l.415.33M21
+               12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="ml-4 whitespace-nowrap">Layanan Tambahan</span>
+            </a>
+
+
 
             <!-- Armada Dropdown -->
             <div x-data="{ open: {{ request()->routeIs([

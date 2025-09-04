@@ -4,15 +4,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
 // --- Admin Controllers ---
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ExtraController;
 use App\Http\Controllers\Admin\BranchController;
-use App\Http\Controllers\Admin\FeatureController;
-use App\Http\Controllers\Admin\VehicleController;
-use App\Http\Controllers\Admin\BookingController;
-use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\FeatureController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\VehicleController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +94,9 @@ Route::middleware(['auth', 'verified'])
 
         // Coupons
         Route::resource('coupons', CouponController::class);
+
+        //Extras
+        Route::resource('extras', ExtraController::class);
     });
 
 /*
