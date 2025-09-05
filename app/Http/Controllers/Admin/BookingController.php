@@ -15,7 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class BookingController extends Controller
 {
     /**
-     * Display a listing of the resource with search functionality.
+     * Display a listing of the resource with search and filter functionality.
      */
     public function index(Request $request)
     {
@@ -57,8 +57,7 @@ class BookingController extends Controller
      */
     public function edit(Booking $booking)
     {
-        // Mengambil data yang dibutuhkan untuk dropdown di form edit
-        $booking->load('payments'); // Memuat riwayat pembayaran
+        $booking->load('payments');
         $users = User::where('role', 'customer')->get();
         $vehicles = Vehicle::all();
         $branches = Branch::all();
@@ -71,7 +70,6 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
-        // Validasi data yang masuk, terutama status
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -81,7 +79,6 @@ class BookingController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Update data booking
         $booking->update($request->all());
 
         return redirect()->route('admin.bookings.index')->with('success', 'Data pemesanan berhasil diperbarui.');
@@ -101,12 +98,8 @@ class BookingController extends Controller
      */
     public function generateInvoice(Booking $booking)
     {
-        // Eager load relasi untuk ditampilkan di invoice
         $booking->load('user', 'vehicle.brand');
-
         $pdf = Pdf::loadView('admin.bookings.invoice', compact('booking'));
-
-        // Tampilkan PDF di browser
         return $pdf->stream('invoice-' . $booking->id . '.pdf');
     }
 
@@ -121,7 +114,6 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:255',
         ]);
 
-        // 1. Catat transaksi pembayaran baru
         $booking->payments()->create([
             'amount' => $request->payment_amount,
             'method' => $request->payment_method,
@@ -130,7 +122,6 @@ class BookingController extends Controller
             'reference' => $request->notes,
         ]);
 
-        // 2. Hitung ulang dan update status pembayaran di booking
         $totalPaid = $booking->payments()->where('status', 'paid')->sum('amount');
         $totalRefunded = $booking->payments()->where('status', 'refunded')->sum('amount');
         $netPaid = $totalPaid - $totalRefunded;
@@ -158,10 +149,8 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:255',
         ]);
 
-        // 1. Ubah status booking menjadi 'cancelled'
         $booking->update(['status' => 'cancelled']);
 
-        // 2. Buat catatan pembayaran baru untuk refund
         $booking->payments()->create([
             'amount' => $request->refund_amount,
             'method' => $request->refund_method,

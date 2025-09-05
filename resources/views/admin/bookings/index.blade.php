@@ -8,23 +8,24 @@
             <h2 class="text-xl font-semibold text-gray-800">Daftar Pemesanan</h2>
         </div>
 
-        <!-- Panel Filter Baru -->
+        <!-- Panel Filter Diperbarui -->
         <form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-6" x-data
             @submit.prevent="$el.submit()">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                 <!-- Pencarian Real-time -->
                 <div class="md:col-span-2">
                     <label for="search" class="block text-sm font-medium text-gray-700">Cari</label>
                     <input type="text" name="search" id="search" placeholder="ID, Pelanggan, Mobil..."
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ request('search') }}"
-                        x-on:input.debounce.500ms="$el.form.submit()">
+                        class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 shadow-sm"
+                        value="{{ request('search') }}" @input.debounce.500ms="$el.form.submit()">
                 </div>
 
                 <!-- Filter Status -->
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                    <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        x-on:change="$el.form.submit()">
+                    <select name="status" id="status"
+                        class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 shadow-sm"
+                        @change="$el.form.submit()">
                         <option value="">Semua Status</option>
                         <option value="pending" @selected(request('status') == 'pending')>Pending</option>
                         <option value="confirmed" @selected(request('status') == 'confirmed')>Confirmed</option>
@@ -34,21 +35,29 @@
                     </select>
                 </div>
 
-                <!-- Filter Tanggal -->
+                <!-- Filter Tanggal Mulai -->
                 <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Sewa</label>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700">Dari Tanggal</label>
                     <input type="date" name="start_date" id="start_date"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        value="{{ request('start_date') }}" x-on:change="$el.form.submit()">
+                        class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 shadow-sm"
+                        value="{{ request('start_date') }}" @change="$el.form.submit()">
+                </div>
+
+                <!-- Filter Tanggal Selesai -->
+                <div>
+                    <label for="end_date" class="block text-sm font-medium text-gray-700">Sampai Tanggal</label>
+                    <input type="date" name="end_date" id="end_date"
+                        class="mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 shadow-sm"
+                        value="{{ request('end_date') }}" @change="$el.form.submit()">
                 </div>
 
                 <!-- Tombol Refresh -->
-                <div class="flex items-center">
+                <div class="flex flex-col">
+                    <label class="block text-sm font-medium text-transparent select-none">&nbsp;</label>
                     <a href="{{ route('admin.bookings.index') }}"
                         class="w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">
                         Refresh
                     </a>
-
                 </div>
             </div>
         </form>
@@ -82,17 +91,21 @@
                     @forelse ($bookings as $booking)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                #{{ $booking->id }}</td>
+                                #{{ $booking->id }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $booking->user->name ?? 'N/A' }}</td>
+                                {{ $booking->user->name ?? 'N/A' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $booking->vehicle->name ?? 'N/A' }}</td>
+                                {{ $booking->vehicle->name ?? 'N/A' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $booking->pickup_datetime->format('d M Y') }} -
                                 {{ $booking->dropoff_datetime->format('d M Y') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp
-                                {{ number_format($booking->grand_total) }}</td>
+                                {{ number_format($booking->grand_total) }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 @php
                                     $statusClasses = [

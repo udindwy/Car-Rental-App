@@ -12,17 +12,28 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Menampilkan form profil pengguna berdasarkan perannya.
      */
     public function edit(Request $request): View
     {
+        // Periksa peran pengguna yang sedang login
+        if ($request->user()->role === 'admin' || $request->user()->role === 'staff') {
+            // Jika admin atau staff, tampilkan view profil admin
+            // yang menggunakan layout admin panel.
+            return view('admin.profile.edit', [
+                'user' => $request->user(),
+            ]);
+        }
+
+        // Jika bukan (adalah pelanggan), tampilkan view profil standar
+        // yang menggunakan layout aplikasi biasa.
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
     }
 
     /**
-     * Update the user's profile information.
+     * Memperbarui informasi profil pengguna.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -34,11 +45,16 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        // Arahkan kembali ke route profil yang benar berdasarkan peran
+        if ($request->user()->role === 'admin' || $request->user()->role === 'staff') {
+            return Redirect::route('admin.profile.edit')->with('status', 'profile-updated');
+        }
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * Delete the user's account.
+     * Menghapus akun pengguna.
      */
     public function destroy(Request $request): RedirectResponse
     {

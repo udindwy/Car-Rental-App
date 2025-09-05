@@ -11,15 +11,21 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    /**
+     * Menampilkan halaman utama dasbor admin dengan data KPI dan aktivitas terbaru.
+     */
     public function index()
     {
         try {
-            // --- Logika Pendapatan ---
+            // --- 1. Kalkulasi Pendapatan Bersih ---
+            // Total pemasukan dari pesanan yang statusnya 'completed'
             $totalIncome = Booking::where('status', 'completed')->sum('grand_total');
+            // Total pengeluaran dari semua transaksi refund
             $totalRefunds = Payment::where('status', 'refunded')->sum('amount');
+            // Pendapatan bersih adalah pemasukan dikurangi pengeluaran refund
             $totalRevenue = $totalIncome - $totalRefunds;
 
-            // --- KPI Lainnya ---
+            // --- 2. Kalkulasi KPI Lainnya ---
             $totalBookings = Booking::count();
             $activeVehicles = Vehicle::where('status', 'active')->count();
             $totalVehicles = Vehicle::count();
@@ -27,19 +33,21 @@ class DashboardController extends Controller
             $occupancyRate = ($totalVehicles > 0) ? ($vehiclesOnRent / $totalVehicles) * 100 : 0;
             $todayBookings = Booking::whereDate('created_at', today())->count();
 
-            // --- Aktivitas Terbaru ---
+            // --- 3. Mengambil Aktivitas Terbaru ---
             $recentBookings = Booking::with(['user', 'vehicle'])->latest()->take(5)->get();
             $recentVehicles = Vehicle::with('brand')->latest()->take(5)->get();
+
+            // Gabungkan kedua koleksi, urutkan berdasarkan tanggal dibuat, dan ambil 5 teratas
             $activities = $recentBookings->concat($recentVehicles)
                 ->sortByDesc('created_at')
                 ->take(5);
 
-            // --- Data Grafik ---
+            // --- 4. Menyiapkan Data untuk Grafik ---
             $bookingsChart = Booking::select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('count(*) as count')
             )
-                ->where('created_at', '>=', now()->subDays(6))
+                ->where('created_at', '>=', now()->subDays(6)) // Mengambil data 7 hari termasuk hari ini
                 ->groupBy('date')
                 ->orderBy('date', 'asc')
                 ->get();
@@ -47,18 +55,19 @@ class DashboardController extends Controller
             $chartLabels = $bookingsChart->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d M'));
             $chartData = $bookingsChart->pluck('count');
         } catch (QueryException $e) {
-            // --- Penanganan Error ---
+            // --- 5. Penanganan Error (jika tabel tidak ada atau error query) ---
+            // Siapkan data default agar halaman tidak rusak.
             $totalRevenue = 0;
             $totalBookings = 0;
             $activeVehicles = 0;
             $occupancyRate = 0;
             $todayBookings = 0;
-            $activities = collect();
+            $activities = collect(); // Kirim collection kosong
             $chartLabels = collect();
             $chartData = collect();
         }
 
-        // --- Mengirim Semua Data ke View ---
+        // --- 6. Mengirim Semua Data ke View ---
         return view('admin.dashboard', compact(
             'totalRevenue',
             'totalBookings',

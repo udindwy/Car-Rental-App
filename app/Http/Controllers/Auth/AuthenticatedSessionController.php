@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,18 +28,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // --- LOGIKA BARU DIMULAI DI SINI ---
-
-        // Ambil data pengguna yang sedang login
+        
         $user = Auth::user();
 
-        // Periksa perannya
+        // Periksa peran pengguna dan arahkan ke dasbor yang sesuai
         if ($user->role === 'admin' || $user->role === 'staff') {
-            // Jika admin atau staff, arahkan ke dashboard admin
-            return redirect()->route('admin.dashboard');
+            // Jika admin atau staff, arahkan ke dasbor admin
+            return redirect()->intended(route('admin.dashboard'));
         } else {
-            // Jika bukan (customer), arahkan ke dashboard biasa
-            return redirect()->intended(RouteServiceProvider::HOME);
+            // Jika bukan, arahkan ke dasbor pelanggan biasa
+            return redirect()->intended(route('dashboard'));
         }
     }
 

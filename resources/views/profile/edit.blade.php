@@ -1,6 +1,8 @@
-<x-admin-layout>
+<x-app-layout>
     <x-slot name="header">
-        {{ __('Profile') }}
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Profil Saya') }}
+        </h2>
     </x-slot>
 
     <div class="py-12">
@@ -24,5 +26,4 @@
             </div>
         </div>
     </div>
-
-</x-admin-layout>
+</x-app-layout>
