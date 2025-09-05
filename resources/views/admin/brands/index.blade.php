@@ -35,20 +35,33 @@
                     @forelse ($brands as $brand)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $brand->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $brand->slug }}</td>
+                                {{ $brand->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $brand->slug }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.brands.edit', $brand) }}"
-                                    class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
-                                <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST"
-                                    class="inline-block"
-                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus brand ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
-                                </form>
+                                <div class="flex items-center justify-end space-x-2">
+                                    <!-- Tombol Edit -->
+                                    <a href="{{ route('admin.brands.edit', $brand) }}"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
+                                        Edit
+                                    </a>
+
+                                    <!-- Tombol Hapus -->
+                                    <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST"
+                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus brand ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
+
                     @empty
                         <tr>
                             <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada data brand.

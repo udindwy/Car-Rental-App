@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
 // --- Admin Controllers ---
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ExtraController;
 use App\Http\Controllers\Admin\BranchController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -99,8 +101,14 @@ Route::middleware(['auth', 'verified'])
         //Extras
         Route::resource('extras', ExtraController::class);
 
-    //Reviews
-    Route::resource('reviews', ReviewController::class)->only(['index', 'update', 'destroy']);
+        //Reviews
+        Route::resource('reviews', ReviewController::class)->only(['index', 'update', 'destroy']);
+
+        //Pages
+        Route::resource('pages', PageController::class);
+
+        Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
     });
 
 /*

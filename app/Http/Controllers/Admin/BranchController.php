@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BranchController extends Controller
 {
@@ -22,7 +23,7 @@ class BranchController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:branches',
             'city' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'nullable|string|max:20',
@@ -41,7 +42,7 @@ class BranchController extends Controller
     public function update(Request $request, Branch $branch)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('branches')->ignore($branch->id)],
             'city' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'nullable|string|max:20',

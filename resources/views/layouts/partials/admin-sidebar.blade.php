@@ -235,6 +235,51 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Dropdown Pengaturan -->
+            <div x-data="{ open: {{ request()->routeIs(['admin.pages.*', 'admin.settings.*']) ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                    class="flex w-full items-center justify-between rounded-lg py-2 px-4 transition-colors duration-200 
+            {{ request()->routeIs(['admin.pages.*', 'admin.settings.*'])
+                ? 'bg-blue-600 font-semibold text-white'
+                : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
+                    <div class="flex items-center">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-1.007 1.11-1.226l.28-.082c.55-.16 1.15.026
+                       1.565.44l.287.287c.414.415.602.965.44 1.565l-.082.28c-.22.55-.685
+                       1.02-1.227 1.11a48.454 48.454 0 01-2.822 0c-.542-.09-.997-.56-1.226-1.11l-.082-.28c-.16-.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082zM15.157
+                       15.157c.09.542.56 1.007 1.11 1.226l.28.082c.55.16 1.15-.026
+                       1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455
+                       48.455 0 01-2.822 0c-.542.09-.997.56-1.226
+                       1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602
+                       1.565-.44l.28.082zM8.843 15.157c.09.542.56 1.007
+                       1.11 1.226l.28.082c.55.16 1.15-.026
+                       1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455
+                       48.455 0 01-2.822 0c-.542.09-.997.56-1.226
+                       1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602
+                       1.565-.44l.28.082z" />
+                        </svg>
+                        <span class="ml-4 whitespace-nowrap">Pengaturan</span>
+                    </div>
+                    <svg :class="{ 'rotate-180': open }" class="h-5 w-5 transform transition-transform" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-cloak class="mt-2 space-y-2 pl-6">
+                    <a href="{{ route('admin.pages.index') }}"
+                        class="block rounded-lg py-2 px-4 text-sm 
+                  {{ request()->routeIs('admin.pages.*') ? 'font-semibold text-white' : 'text-blue-200 hover:text-white' }}">
+                        Halaman
+                    </a>
+                    <a href="{{ route('admin.settings.index') }}"
+                        class="block rounded-lg py-2 px-4 text-sm text-blue-200 hover:text-white">
+                        Situs & Kontak
+                    </a>
+                </div>
+            </div>
         </nav>
     </div>
 </aside>
