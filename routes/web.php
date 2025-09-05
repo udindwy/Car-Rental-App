@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ExtraController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\PaymentController;
@@ -97,6 +98,9 @@ Route::middleware(['auth', 'verified'])
 
         //Extras
         Route::resource('extras', ExtraController::class);
+
+    //Reviews
+    Route::resource('reviews', ReviewController::class)->only(['index', 'update', 'destroy']);
     });
 
 /*
