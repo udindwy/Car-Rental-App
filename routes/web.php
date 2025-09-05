@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,6 +93,12 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])
         Route::resource('pages', PageController::class);
         Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/bookings', [ReportController::class, 'exportBookings'])->name('reports.export.bookings');
+        Route::get('reports/revenue', [ReportController::class, 'exportRevenue'])->name('reports.export.revenue');
+        Route::get('reports/occupancy', [ReportController::class, 'exportOccupancy'])->name('reports.export.occupancy');
+        Route::get('reports/coupon-usage', [ReportController::class, 'exportCouponUsage'])->name('reports.export.coupon_usage');
     });
 
 // Authentication Routes

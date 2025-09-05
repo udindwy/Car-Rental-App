@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
-     * Menampilkan halaman utama dasbor admin dengan data KPI dan aktivitas terbaru.
+     * Menampilkan halaman utama dashboard admin dengan data KPI dan aktivitas terbaru.
      */
     public function index()
     {

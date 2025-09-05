@@ -25,4 +25,12 @@ class Coupon extends Model
         'start_date' => 'date',
         'end_date' => 'date',
     ];
+
+    /**
+     * Mendefinisikan relasi bahwa setiap kupon bisa digunakan di banyak pemesanan.
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
 }
