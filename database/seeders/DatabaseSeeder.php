@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
         Setting::create([
             'site_name' => 'Car Rental',
             'whatsapp' => '6281234567890',
-            'email' => 'kontak@rentalkeren.com',
+            'email' => 'kontak@carrental.com',
             'address' => 'Jl. Malioboro No. 1, Yogyakarta',
         ]);
     }

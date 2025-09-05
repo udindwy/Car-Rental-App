@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('site_name')->default('Nama Rental Anda');
             $table->string('logo')->nullable();
+            $table->string('theme_color')->default('#2563eb');
             $table->string('whatsapp')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
