@@ -1,5 +1,3 @@
-<!-- PERBAIKAN 2: Tambahkan class h-20 untuk menyamakan tinggi -->
-
 <header class="flex h-20 items-center justify-between border-b bg-white px-6 shadow-sm">
     <div class="flex items-center">
         <!-- Tombol Hamburger (Mobile) -->
@@ -38,15 +36,20 @@
                     </div>
                 </button>
             </x-slot>
+
             <x-slot name="content">
-                <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                <!-- PERBAIKAN DI SINI: Menggunakan route 'admin.profile.edit' -->
+                <x-dropdown-link :href="route('admin.profile.edit')">
+                    {{ __('Profile') }}
+                </x-dropdown-link>
+
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <x-dropdown-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-dropdown-link>
+                    <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                        {{ __('Log Out') }}
+                    </x-dropdown-link>
                 </form>
             </x-slot>
         </x-dropdown>
     </div>
-
 </header>

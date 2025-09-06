@@ -12,18 +12,15 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles
+     * @param  string  ...$roles → daftar role yang boleh masuk
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Periksa apakah pengguna sudah login dan apakah perannya ada di dalam daftar yang diizinkan.
+        // Jika belum login atau role tidak ada dalam daftar, tolak akses
         if (!Auth::check() || !in_array(Auth::user()->role, $roles)) {
-            // Jika tidak, tolak akses dengan halaman 403 (Forbidden).
             abort(403, 'AKSI INI TIDAK DIIZINKAN.');
         }
 
-        // Jika diizinkan, lanjutkan ke halaman yang dituju.
         return $next($request);
     }
 }
