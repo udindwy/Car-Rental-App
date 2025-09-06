@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
+use App\Models\Booking;
 use App\Http\Controllers\ProfileController;
 
 // --- Admin Controllers ---

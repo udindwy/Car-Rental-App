@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\BookingStatusChanged;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class Booking extends Model
 {
@@ -25,6 +28,45 @@ class Booking extends Model
         'pickup_datetime' => 'datetime',
         'dropoff_datetime' => 'datetime',
     ];
+
+    /**
+     * The "booted" method of the model.
+     * Di sinilah kita akan menangani semua event secara langsung.
+     */
+    protected static function booted(): void
+    {
+        // Event untuk booking yang BARU DIBUAT
+        static::created(function (Booking $booking) {
+            try {
+                // Pastikan relasi user dimuat dan memiliki email
+                $booking->load('user');
+                if ($booking->user && $booking->user->email) {
+                    Mail::to($booking->user->email)->send(new BookingStatusChanged($booking));
+                }
+            } catch (\Exception $e) {
+                // Catat error jika pengiriman email gagal
+                Log::error('Gagal mengirim email (booking baru) dari Model: ' . $e->getMessage());
+            }
+        });
+
+        // Event untuk booking yang DIUBAH
+        static::updating(function (Booking $booking) {
+            // Hanya kirim email jika kolom 'status' yang berubah
+            if ($booking->isDirty('status')) {
+                try {
+                    // Pastikan relasi user dimuat dan memiliki email
+                    $booking->load('user');
+                    if ($booking->user && $booking->user->email) {
+                        Mail::to($booking->user->email)->send(new BookingStatusChanged($booking));
+                    }
+                } catch (\Exception $e) {
+                    // Catat error jika pengiriman email gagal
+                    Log::error('GAGAL mengirim email (update status) dari Model: ' . $e->getMessage());
+                }
+            }
+        });
+    }
+
 
     /**
      * Get the user that owns the booking.

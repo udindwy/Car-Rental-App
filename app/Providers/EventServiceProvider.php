@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+// PENTING: Pastikan kedua model ini di-import
 use App\Models\Booking;
 use App\Observers\BookingObserver;
+
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -24,9 +26,10 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * The model observers for your application.
-     * KITA KOSONGKAN INI UNTUK SEMENTARA.
+     *
      * @var array
      */
+    // Kita akan kosongkan ini untuk menghindari masalah cache/bootstrap
     protected $observers = [
         // Booking::class => [BookingObserver::class], // Dikosongkan
     ];
@@ -36,9 +39,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // --- PERUBAHAN UTAMA: DAFTARKAN OBSERVER SECARA MANUAL DI SINI ---
-        // Baris ini secara eksplisit memberitahu Laravel:
-        // "Untuk model Booking, pasang dan gunakan BookingObserver."
+        // =========================================================================
+        // DAFTARKAN OBSERVER SECARA MANUAL DI SINI
+        // Ini adalah cara yang lebih pasti dan akan menyelesaikan masalah registrasi.
+        // =========================================================================
         Booking::observe(BookingObserver::class);
     }
 

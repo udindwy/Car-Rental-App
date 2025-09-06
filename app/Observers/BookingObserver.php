@@ -10,39 +10,59 @@ use Illuminate\Support\Facades\Mail;
 class BookingObserver
 {
     /**
-     * Handle the Booking "updated" event.
+     * Handle the Booking "created" event.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return void
      */
-    public function updated(Booking $booking): void
+    public function created(Booking $booking): void
     {
-        // Catat di log setiap kali ada booking yang di-update
-        Log::info('Observer `updated` terpanggil untuk Booking ID: ' . $booking->id);
+        Log::info('Observer `created` terpanggil untuk Booking ID: ' . $booking->id);
+        Log::info('Booking baru dibuat! Mencoba mengirim email ke: ' . $booking->user->email);
 
-        // Periksa apakah kolom 'status' adalah salah satu kolom yang berubah.
-        if ($booking->isDirty('status')) {
-            Log::info('Status berubah! Mencoba mengirim email ke: ' . $booking->user->email);
-
-            // Pastikan email pelanggan valid sebelum mengirim.
-            if ($booking->user && $booking->user->email) {
-                try {
-                    Mail::to($booking->user->email)->send(new BookingStatusChanged($booking));
-                    Log::info('Email untuk Booking ID ' . $booking->id . ' berhasil dimasukkan ke antrian kirim.');
-                } catch (\Exception $e) {
-                    // Jika gagal, catat error ke log agar bisa di-debug
-                    Log::error('Gagal mengirim email notifikasi status booking: ' . $e->getMessage());
-                }
-            } else {
-                Log::warning('Gagal mengirim email, user atau email tidak ditemukan untuk Booking ID: ' . $booking->id);
-            }
-        } else {
-            Log::info('Status tidak berubah untuk Booking ID: ' . $booking->id . ', email tidak dikirim.');
+        try {
+            Mail::to($booking->user->email)->send(new BookingStatusChanged($booking));
+            Log::info('Email untuk booking baru berhasil dimasukkan ke antrian kirim.');
+        } catch (\Exception $e) {
+            Log::error('Gagal saat mengirim email untuk booking baru: ' . $e->getMessage());
         }
     }
 
     /**
-     * Handle the Booking "created" event.
+     * Handle the Booking "updating" event.
+     * Kita memindahkan logika ke sini karena event 'updating' sudah terbukti berjalan.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return void
      */
-    public function created(Booking $booking): void
+    public function updating(Booking $booking): void
     {
-        // Logika untuk mengirim email saat booking baru dibuat bisa ditambahkan di sini.
+        Log::info('Observer `updating` terpanggil untuk Booking ID: ' . $booking->id);
+
+        // isDirty() berfungsi baik di 'updating' dan 'updated'
+        if ($booking->isDirty('status')) {
+            Log::info('Status berubah di event UPDATING! Mencoba mengirim email ke: ' . $booking->user->email);
+            try {
+                Mail::to($booking->user->email)->send(new BookingStatusChanged($booking));
+                Log::info('Email perubahan status berhasil dimasukkan ke antrian kirim dari event UPDATING.');
+            } catch (\Exception $e) {
+                Log::error('Gagal saat mengirim email perubahan status dari event UPDATING: ' . $e->getMessage());
+            }
+        } else {
+            Log::info('Booking ID: ' . $booking->id . ' diupdate (updating), tetapi status tidak berubah. Email tidak dikirim.');
+        }
+    }
+
+    /**
+     * Handle the Booking "updated" event.
+     * Method ini kita biarkan kosong untuk sementara.
+     *
+     * @param  \App\Models\Booking  $booking
+     * @return void
+     */
+    public function updated(Booking $booking): void
+    {
+        // Logika dipindahkan ke updating() untuk memastikan eksekusi.
+        Log::info('Observer `updated` terpanggil (method ini sekarang kosong).');
     }
 }
