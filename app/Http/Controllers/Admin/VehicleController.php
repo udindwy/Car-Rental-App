@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Brand;
+use App\Models\Extra;
 use App\Models\Branch;
 use App\Models\Feature;
 use App\Models\Vehicle;
@@ -38,7 +39,9 @@ class VehicleController extends Controller
         $brands = Brand::all();
         $categories = Category::all();
         $features = Feature::all();
-        return view('admin.vehicles.create', compact('branches', 'brands', 'categories', 'features'));
+        $extras = Extra::all();
+
+        return view('admin.vehicles.create', compact('branches', 'brands', 'categories', 'features', 'extras'));
     }
 
     /**
@@ -49,20 +52,20 @@ class VehicleController extends Controller
         $data = $request->validated();
         $data['slug'] = Str::slug($data['name']) . '-' . time();
 
+        // 1. Buat record mobil baru
         $vehicle = Vehicle::create($data);
 
-        // Simpan relasi fitur (many-to-many)
-        if ($request->has('features')) {
-            $vehicle->features()->attach($request->features);
-        }
+        // 2. Gunakan sync untuk melampirkan fitur dan extras. Ini lebih konsisten.
+        $vehicle->features()->sync($request->input('features', []));
+        $vehicle->extras()->sync($request->input('extras', [])); // <-- DITAMBAHKAN
 
-        // Unggah dan simpan gambar galeri
+        // 3. Unggah dan simpan gambar galeri
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $key => $image) {
                 $path = $image->store('vehicles', 'public');
                 $vehicle->images()->create([
                     'path' => $path,
-                    'is_primary' => $key === 0, // Set gambar pertama sebagai primary
+                    'is_primary' => $key === 0,
                 ]);
             }
         }
@@ -75,12 +78,16 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle)
     {
-        $vehicle->load('features', 'images'); // Eager load relasi
+        // Eager load semua relasi yang dibutuhkan oleh form
+        $vehicle->load('features', 'images', 'extras'); // <-- 'extras' DITAMBAHKAN
+
         $branches = Branch::all();
         $brands = Brand::all();
         $categories = Category::all();
         $features = Feature::all();
-        return view('admin.vehicles.edit', compact('vehicle', 'branches', 'brands', 'categories', 'features'));
+        $extras = Extra::all();
+
+        return view('admin.vehicles.edit', compact('vehicle', 'branches', 'brands', 'categories', 'features', 'extras'));
     }
 
     /**
@@ -90,12 +97,14 @@ class VehicleController extends Controller
     {
         $data = $request->validated();
 
+        // 1. Update data utama mobil
         $vehicle->update($data);
 
-        // Sinkronisasi relasi fitur (menambah yang baru, menghapus yang tidak dipilih)
-        $vehicle->features()->sync($request->features ?? []);
+        // 2. Sinkronisasi relasi fitur dan extras
+        $vehicle->features()->sync($request->input('features', []));
+        $vehicle->extras()->sync($request->input('extras', [])); // <-- DITAMBAHKAN
 
-        // Tambahkan gambar baru jika ada
+        // 3. Tambahkan gambar baru jika ada
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('vehicles', 'public');
@@ -111,18 +120,15 @@ class VehicleController extends Controller
      */
     public function destroy(Vehicle $vehicle)
     {
-        // Hapus semua file gambar terkait dari storage
         foreach ($vehicle->images as $image) {
             Storage::disk('public')->delete($image->path);
         }
 
-        $vehicle->delete(); // Hapus record dari database
+        $vehicle->delete();
         return redirect()->route('admin.vehicles.index')->with('success', 'Data mobil berhasil dihapus.');
     }
 
-    // app/Http/Controllers/Admin/VehicleController.php
-
-    // Jangan lupa tambahkan `use App\Models\PricingRule;` di bagian atas
+    // --- METHOD LAINNYA (TIDAK ADA PERUBAHAN) ---
 
     public function pricing(Vehicle $vehicle)
     {
@@ -139,9 +145,7 @@ class VehicleController extends Controller
             'start_date' => 'nullable|required_if:type,date_range|date',
             'end_date' => 'nullable|required_if:type,date_range|date|after_or_equal:start_date',
         ]);
-
         $vehicle->pricingRules()->create($request->all());
-
         return redirect()->back()->with('success', 'Aturan harga baru berhasil ditambahkan.');
     }
 
@@ -150,10 +154,6 @@ class VehicleController extends Controller
         $rule->delete();
         return redirect()->back()->with('success', 'Aturan harga berhasil dihapus.');
     }
-
-    // app/Http/Controllers/Admin/VehicleController.php
-
-    // Jangan lupa tambahkan `use App\Models\VehicleBlackout;` di bagian atas
 
     public function availability(Vehicle $vehicle)
     {
@@ -168,9 +168,7 @@ class VehicleController extends Controller
             'end_datetime' => 'required|date|after_or_equal:start_datetime',
             'reason' => 'nullable|string|max:255',
         ]);
-
         $vehicle->blackouts()->create($request->all());
-
         return redirect()->back()->with('success', 'Tanggal berhasil diblokir.');
     }
 
@@ -192,18 +190,12 @@ class VehicleController extends Controller
 
     public function importBlackouts(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:csv,txt',
-        ]);
-
+        $request->validate(['file' => 'required|mimes:csv,txt']);
         try {
             Excel::import(new BlackoutsImport, $request->file('file'));
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            $failures = $e->failures();
-            // Handle validation failures, redirect back with errors
-            return redirect()->back()->with('import_errors', $failures);
+            return redirect()->back()->with('import_errors', $e->failures());
         }
-
         return redirect()->back()->with('success', 'Data jadwal berhasil diimpor.');
     }
 }

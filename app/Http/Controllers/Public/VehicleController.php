@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use App\Services\PriceCalculatorService;
 
 class VehicleController extends Controller
 {
@@ -52,8 +53,24 @@ class VehicleController extends Controller
     public function show(Vehicle $vehicle)
     {
         // Eager load semua relasi yang dibutuhkan untuk ditampilkan di halaman detail
-        $vehicle->load(['brand', 'category', 'features', 'images', 'reviews.user']);
+        $vehicle->load(['brand', 'category', 'features', 'images', 'reviews.user', 'extras']);
 
         return view('public.vehicle-detail', compact('vehicle'));
+    }
+
+    public function calculatePrice(Request $request, Vehicle $vehicle, PriceCalculatorService $calculator)
+    {
+        $pickupDate = $request->input('pickup_date');
+        $dropoffDate = $request->input('dropoff_date');
+        $extraIds = $request->input('extras', []); 
+
+        // Teruskan $extraIds ke service
+        $result = $calculator->calculate($vehicle, $pickupDate, $dropoffDate, $extraIds);
+
+        if (isset($result['error'])) {
+            return response()->json($result, 422);
+        }
+
+        return response()->json($result);
     }
 }
