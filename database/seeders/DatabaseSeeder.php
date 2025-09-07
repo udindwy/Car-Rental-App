@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// Pastikan semua model yang digunakan sudah di-import
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Brand;
@@ -39,11 +38,13 @@ class DatabaseSeeder extends Seeder
         Category::factory(4)->create();
         Feature::factory(8)->create();
 
+        Extra::create(['name' => 'Supir Profesional', 'type' => 'per_day', 'price' => 300000]);
+        Extra::create(['name' => 'GPS Navigasi', 'type' => 'per_booking', 'price' => 50000]);
+        Extra::create(['name' => 'Baby Car Seat', 'type' => 'per_booking', 'price' => 75000]);
+        Extra::create(['name' => 'Asuransi Penuh', 'type' => 'per_day', 'price' => 150000]);
+
         // 3. Buat Kendaraan
-        Vehicle::factory(40)->create()->each(function ($vehicle) {
-            $features = Feature::inRandomOrder()->limit(rand(1, 5))->get();
-            $vehicle->features()->attach($features);
-        });
+        Vehicle::factory(40)->create();
 
         // 4. Buat Data Transaksional
         Booking::factory(50)->create();
@@ -51,13 +52,7 @@ class DatabaseSeeder extends Seeder
         Payment::factory(40)->create();
         Coupon::factory(10)->create();
 
-        // 5. Buat Layanan Tambahan secara eksplisit
-        Extra::create(['name' => 'Supir Profesional', 'type' => 'per_day', 'price' => 150000]);
-        Extra::create(['name' => 'Kursi Bayi (Child Seat)', 'type' => 'per_day', 'price' => 50000]);
-        Extra::create(['name' => 'Asuransi Perjalanan Penuh', 'type' => 'per_booking', 'price' => 100000]);
-        Extra::create(['name' => 'Biaya Antar/Jemput Bandara', 'type' => 'per_booking', 'price' => 75000]);
-
-        // 6. Buat Halaman Statis (PERBAIKAN DI SINI)
+        // 5. Buat Halaman Statis
         Page::create([
             'title' => 'Tentang Kami',
             'slug' => 'tentang-kami',
@@ -72,12 +67,13 @@ class DatabaseSeeder extends Seeder
         ]);
         Page::factory(3)->create();
 
-        // 7. Buat Pengaturan Situs
+        // 6. Buat Pengaturan Situs Awal (SESUAI MIGRASI ANDA)
         Setting::create([
             'site_name' => 'Car Rental',
             'whatsapp' => '6281234567890',
             'email' => 'kontak@carrental.com',
             'address' => 'Jl. Malioboro No. 1, Yogyakarta',
+            'phone' => '0274123456',
         ]);
     }
 }
