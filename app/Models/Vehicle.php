@@ -28,7 +28,7 @@ class Vehicle extends Model
         'status',
     ];
 
-    // --- Definisikan relasi agar mudah diakses ---
+    // --- Relasi ---
     public function brand()
     {
         return $this->belongsTo(Brand::class);
@@ -59,12 +59,22 @@ class Vehicle extends Model
         return $this->hasMany(VehicleBlackout::class);
     }
 
-    // --- TAMBAHKAN RELASI BARU YANG HILANG DI SINI ---
-    /**
-     * Mendefinisikan relasi bahwa setiap mobil bisa memiliki banyak pemesanan.
-     */
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Accessor untuk menghitung rata-rata rating.
+     * Akan tersedia sebagai properti $vehicle->average_rating
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->reviews()->avg('rating') ?? 0, 1);
     }
 }
