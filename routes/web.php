@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
+use App\Http\Controllers\Public\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,8 @@ Route::get('/', function () {
 })->name('home');
 Route::get('/catalog', [PublicVehicleController::class, 'index'])->name('catalog');
 Route::get('/mobil/{vehicle:slug}', [PublicVehicleController::class, 'show'])->name('vehicle.show');
+Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
 
 // --- Authenticated Customer Routes ---
