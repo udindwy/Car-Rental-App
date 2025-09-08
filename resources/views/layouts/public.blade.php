@@ -12,7 +12,8 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{-- Alpine.js tidak perlu di-load dua kali jika sudah ada di app.js --}}
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
+    </script>
 </head>
 
 <body class="font-sans antialiased bg-gray-50 text-slate-800">

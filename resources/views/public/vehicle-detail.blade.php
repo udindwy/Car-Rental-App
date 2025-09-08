@@ -33,18 +33,23 @@
                         <h2 class="text-2xl font-semibold text-dark-slate mb-4">Spesifikasi & Fitur</h2>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 text-neutral-gray">
                             <div class="flex items-center space-x-2"><i class="lucide-users text-blue-600"></i>
-                                <span>{{ $vehicle->seats }} Kursi</span></div>
+                                <span>{{ $vehicle->seats }} Kursi</span>
+                            </div>
                             <div class="flex items-center space-x-2"><i
                                     class="lucide-sliders-horizontal text-blue-600"></i>
-                                <span>{{ $vehicle->transmission }}</span></div>
+                                <span>{{ $vehicle->transmission }}</span>
+                            </div>
                             <div class="flex items-center space-x-2"><i class="lucide-fuel text-blue-600"></i>
-                                <span>{{ ucfirst($vehicle->fuel) }}</span></div>
+                                <span>{{ ucfirst($vehicle->fuel) }}</span>
+                            </div>
                             <div class="flex items-center space-x-2"><i class="lucide-briefcase text-blue-600"></i>
-                                <span>{{ $vehicle->luggage ?? 0 }} Bagasi</span></div>
+                                <span>{{ $vehicle->luggage ?? 0 }} Bagasi</span>
+                            </div>
                             @foreach ($vehicle->features as $feature)
                                 <div class="flex items-center space-x-2"><i
                                         class="lucide-check-circle-2 text-blue-600"></i>
-                                    <span>{{ $feature->name }}</span></div>
+                                    <span>{{ $feature->name }}</span>
+                                </div>
                             @endforeach
                         </div>
                     </div>
@@ -150,7 +155,13 @@
                         </div>
 
                         <div class="mt-6">
-                            <a href="#" x-show="summary.total_price && !isLoading" x-transition
+                            <a x-bind:href="'{{ route('checkout.show') }}?' + new URLSearchParams({
+                                vehicle_id: {{ $vehicle->id }},
+                                pickup_datetime: pickupDate,
+                                dropoff_datetime: dropoffDate,
+                                'extras[]': selectedExtras
+                            }).toString()"
+                                x-show="summary.total_price && !isLoading" x-transition
                                 class="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg">
                                 Lanjutkan Pemesanan
                             </a>
@@ -176,7 +187,13 @@
                     <p class="font-bold text-xl text-dark-slate"
                         x-text="`Rp ${summary.total_price.toLocaleString('id-ID')}`"></p>
                 </div>
-                <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                <a x-bind:href="'{{ route('checkout.show') }}?' + new URLSearchParams({
+                    vehicle_id: {{ $vehicle->id }},
+                    pickup_datetime: pickupDate,
+                    dropoff_datetime: dropoffDate,
+                    'extras[]': selectedExtras
+                }).toString()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
                     Pesan
                 </a>
             </div>

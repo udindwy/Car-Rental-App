@@ -12,10 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Daftarkan semua nama panggilan middleware di sini
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
-            // PASTIKAN BARIS INI ADA DAN BENAR
             'redirect.if.admin' => \App\Http\Middleware\RedirectIfAdmin::class,
         ]);
     })
