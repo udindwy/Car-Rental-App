@@ -2,18 +2,26 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 
 <head>
-    <meta charset="utf-t">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <!-- Scripts & Styles dari Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}">
-    </script>
+
+    <!-- ======================================================================= -->
+    <!-- ▼▼▼ SCRIPT MIDTRANS WAJIB ADA DI SINI ▼▼▼ -->
+    <!-- Pastikan Client Key di file .env Anda sudah benar. -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <!-- ▲▲▲ =============================================================== ▲▲▲ -->
+
 </head>
 
 <body class="font-sans antialiased bg-gray-50 text-slate-800">
@@ -30,9 +38,8 @@
                     </a>
                 </div>
 
-                {{-- Menu Desktop (Tersembunyi di mobile) --}}
+                {{-- Menu Desktop --}}
                 <div class="hidden md:flex md:items-center md:space-x-8">
-                    {{-- PERUBAHAN DI SINI --}}
                     <a href="{{ route('home') }}"
                         class="font-medium transition-colors duration-200 {{ request()->routeIs('home') ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600' }}">
                         Home
@@ -62,7 +69,7 @@
                     @endauth
                 </div>
 
-                {{-- Tombol Hamburger (Hanya muncul di mobile) --}}
+                {{-- Tombol Hamburger (Mobile) --}}
                 <div class="md:hidden flex items-center">
                     <button @click="open = !open" type="button"
                         class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
@@ -84,10 +91,9 @@
             </div>
         </div>
 
-        {{-- Menu Mobile (Muncul saat tombol hamburger diklik) --}}
+        {{-- Menu Mobile --}}
         <div x-show="open" @click.away="open = false" class="md:hidden" id="mobile-menu" style="display: none;">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                {{-- PERUBAHAN DI SINI --}}
                 <a href="{{ route('home') }}"
                     class="block px-3 py-2 rounded-md font-medium {{ request()->routeIs('home') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
                     Home
@@ -118,7 +124,7 @@
         </div>
     </nav>
 
-    {{-- Konten --}}
+    {{-- Konten Utama --}}
     <main class="min-h-screen">
         {{ $slot }}
     </main>
@@ -126,6 +132,7 @@
     {{-- Footer --}}
     @include('layouts.partials.public-footer')
 
+    {{-- Slot untuk script tambahan dari halaman lain (seperti checkout.blade.php) --}}
     @stack('scripts')
 </body>
 

@@ -2,9 +2,21 @@
     <div class="container mx-auto px-4 py-12">
         <h1 class="text-3xl md:text-4xl font-bold text-center text-dark-slate mb-8">Checkout Pesanan</h1>
 
-        {{-- Tambahkan x-data dan @submit.prevent --}}
-        <form x-data="checkoutForm" @submit.prevent="submit" enctype="multipart/form-data">
+        <form x-data="checkoutForm" @submit.prevent="submit" enctype="multipart/form-data" id="checkoutForm">
             @csrf
+            {{-- Menampilkan error validasi dari server --}}
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6"
+                    role="alert">
+                    <strong class="font-bold">Oops! Terjadi kesalahan.</strong>
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             {{-- Hidden inputs untuk membawa data pesanan --}}
             <input type="hidden" name="vehicle_id" value="{{ $vehicle->id }}">
             <input type="hidden" name="pickup_datetime" value="{{ $pickupDate }}">
@@ -16,7 +28,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
 
-                {{-- KOLOM KIRI: FORM DATA PELANGGAN --}}
+                {{-- KOLOM KIRI: FORM DATA PELANGGAN & PEMBAYARAN --}}
                 <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-md space-y-6">
                     <div>
                         <h2 class="text-2xl font-semibold text-dark-slate">Data Penyewa</h2>
@@ -42,7 +54,6 @@
                             required>
                     </div>
 
-                    {{-- Upload Dokumen --}}
                     <div class="border-t pt-6 space-y-4">
                         <div>
                             <label for="ktp" class="block text-sm font-medium text-slate-700">Upload Foto
@@ -61,6 +72,39 @@
                             <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
                         </div>
                     </div>
+
+                    <div class="border-t pt-6">
+                        <h2 class="text-xl font-semibold text-dark-slate">Pilih Metode Pembayaran</h2>
+                        <div class="mt-4 space-y-4">
+                            <label for="payment_gateway"
+                                class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600">
+                                <input id="payment_gateway" name="payment_method" type="radio" value="gateway"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500" checked>
+                                <div class="ml-3 text-sm">
+                                    <p class="font-bold text-gray-900">Pembayaran Online</p>
+                                    <p class="text-gray-500">Kartu Kredit, GoPay, Virtual Account, dll.</p>
+                                </div>
+                            </label>
+                            <label for="payment_transfer"
+                                class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600">
+                                <input id="payment_transfer" name="payment_method" type="radio" value="transfer"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <div class="ml-3 text-sm">
+                                    <p class="font-bold text-gray-900">Transfer Bank (Manual)</p>
+                                    <p class="text-gray-500">Perlu konfirmasi manual setelah transfer.</p>
+                                </div>
+                            </label>
+                            <label for="payment_cash"
+                                class="flex items-center p-4 border rounded-lg cursor-pointer has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600">
+                                <input id="payment_cash" name="payment_method" type="radio" value="cash"
+                                    class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                <div class="ml-3 text-sm">
+                                    <p class="font-bold text-gray-900">Bayar di Tempat (Cash)</p>
+                                    <p class="text-gray-500">Siapkan uang tunai saat pengambilan mobil.</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- KOLOM KANAN: RINGKASAN PESANAN --}}
@@ -68,44 +112,39 @@
                     <div class="sticky top-24 bg-white p-6 rounded-xl shadow-lg">
                         <h3 class="text-xl font-bold text-dark-slate border-b pb-4">Ringkasan Pesanan</h3>
 
-
-                        {{-- Info Mobil --}}
-                        <div class="flex items-center space-x-4">
-                            <img src="{{ $vehicle->images->first() ? Storage::url($vehicle->images->first()->path) : asset('images/default-vehicle.jpg') }}"
-                                class="w-24 h-16 object-cover rounded-lg shadow">
+                        <div class="mt-4 flex items-center space-x-4">
+                            <img src="{{ $vehicle->images->first() ? Storage::url($vehicle->images->first()->path) : 'https://via.placeholder.com/150' }}"
+                                class="w-24 h-16 object-cover rounded-lg">
                             <div>
-                                <p class="font-semibold text-slate-800">{{ $vehicle->name }}</p>
-                                <p class="text-sm text-gray-500">{{ $vehicle->brand->name }}</p>
+                                <p class="font-semibold text-dark-slate">{{ $vehicle->name }}</p>
+                                <p class="text-sm text-neutral-gray">{{ $vehicle->brand->name }}</p>
                             </div>
                         </div>
 
-                        {{-- Detail Biaya --}}
-                        <div class="border-t pt-4 space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-500">Sewa Mobil ({{ $priceDetails['duration'] }} hari)</span>
+                        <div class="mt-4 border-t pt-4 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-neutral-gray">Sewa Mobil ({{ $priceDetails['duration'] }}
+                                    hari)</span>
                                 <span class="font-medium">Rp
                                     {{ number_format($priceDetails['subtotal'], 0, ',', '.') }}</span>
                             </div>
                             @if ($priceDetails['extras_cost'] > 0)
-                                <div class="flex justify-between">
-                                    <span class="text-gray-500">Layanan Tambahan</span>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-neutral-gray">Layanan Tambahan</span>
                                     <span class="font-medium">Rp
                                         {{ number_format($priceDetails['extras_cost'], 0, ',', '.') }}</span>
                                 </div>
                             @endif
                         </div>
 
-                        {{-- Total --}}
-                        <div class="border-t pt-4 flex justify-between items-center">
-                            <span class="text-lg font-bold text-slate-800">Total Biaya</span>
+                        <div class="mt-4 border-t pt-4 flex justify-between items-center">
+                            <span class="text-lg font-bold text-dark-slate">Total Biaya</span>
                             <span class="text-xl font-extrabold text-blue-600">Rp
                                 {{ number_format($priceDetails['total_price'], 0, ',', '.') }}</span>
                         </div>
 
-
                         <button type="submit" x-text="buttonLabel" :disabled="isLoading"
                             class="mt-6 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-lg transition">
-                            Lanjutkan ke Pembayaran
                         </button>
 
                         <div x-show="errorMessage"
@@ -118,85 +157,100 @@
         </form>
     </div>
 
-    {{-- ▼▼▼ TAMBAHKAN BLOK SCRIPT INI ▼▼▼ --}}
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('checkoutForm', () => ({
-                isLoading: false,
-                buttonLabel: 'Lanjutkan ke Pembayaran',
-                errorMessage: '',
+    @push('scripts')
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('checkoutForm', () => ({
+                    isLoading: false,
+                    buttonLabel: 'Lanjutkan Pesanan',
+                    errorMessage: '',
 
-                submit(event) {
-                    this.isLoading = true;
-                    this.buttonLabel = 'Memproses...';
-                    this.errorMessage = '';
-
-                    const form = event.target;
-                    const formData = new FormData(form);
-
-                    fetch(form.action, {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .getAttribute('content')
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                // Jika validasi gagal atau ada error server
-                                return response.json().then(data => Promise.reject(data));
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.snap_token) {
-                                // Buka pop-up pembayaran Midtrans
-                                snap.pay(data.snap_token, {
-                                    onSuccess: function(result) {
-                                        alert("Pembayaran berhasil!");
-                                        window.location.href =
-                                            '/'; // Arahkan ke halaman lain
-                                    },
-                                    onPending: function(result) {
-                                        alert("Menunggu pembayaran Anda!");
-                                        window.location.href = '/';
-                                    },
-                                    onError: function(result) {
-                                        alert("Pembayaran gagal!");
-                                        this.resetButton();
-                                    },
-                                    onClose: function() {
-                                            alert(
-                                                'Anda menutup pop-up tanpa menyelesaikan pembayaran'
-                                                );
-                                            this.resetButton();
-                                        }.bind(
-                                            this
-                                            ) // bind 'this' agar bisa panggil resetButton
-                                });
-                            } else {
-                                this.errorMessage = 'Gagal mendapatkan token pembayaran.';
-                                this.resetButton();
-                            }
-                        })
-                        .catch(error => {
-                            this.errorMessage = error.message ||
-                                'Terjadi kesalahan. Cek kembali isian Anda.';
-                            if (error.errors) {
-                                // Tampilkan error validasi pertama
-                                this.errorMessage = Object.values(error.errors)[0][0];
-                            }
-                            this.resetButton();
+                    loadSnapScript() {
+                        return new Promise((resolve, reject) => {
+                            if (window.snap) return resolve();
+                            const script = document.createElement('script');
+                            script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+                            script.setAttribute('data-client-key',
+                                "{{ config('midtrans.client_key') }}");
+                            script.onload = resolve;
+                            script.onerror = () => reject(new Error(
+                                'Gagal memuat script pembayaran.'));
+                            document.head.appendChild(script);
                         });
-                },
+                    },
 
-                resetButton() {
-                    this.isLoading = false;
-                    this.buttonLabel = 'Lanjutkan ke Pembayaran';
-                }
-            }));
-        });
-    </script>
+                    submit(event) {
+                        this.isLoading = true;
+                        this.buttonLabel = 'Memproses...';
+                        this.errorMessage = '';
+
+                        const form = event.target;
+                        const formData = new FormData(form);
+                        const self = this;
+
+                        // SEMUA metode sekarang menggunakan fetch
+                        fetch(form.action, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': form.querySelector('input[name=_token]').value
+                                }
+                            })
+                            .then(res => res.json().then(data => ({
+                                ok: res.ok,
+                                data
+                            })))
+                            .then(({
+                                ok,
+                                data
+                            }) => {
+                                if (!ok) throw data;
+
+                                // Cek respons dari controller
+                                if (data.snap_token) {
+                                    // Jika ada snap_token, buka Midtrans
+                                    return this.loadSnapScript().then(() => {
+                                        window.snap.pay(data.snap_token, {
+                                            onSuccess: (result) => window.location
+                                                .href =
+                                                `{{ route('home') }}?booking_ref=${result.order_id}&status=success`,
+                                            onPending: (result) => window.location
+                                                .href =
+                                                `{{ route('home') }}?booking_ref=${result.order_id}&status=pending`,
+                                            onError: (result) => {
+                                                self.errorMessage =
+                                                    'Pembayaran gagal. Silakan coba lagi.';
+                                                self.resetButton();
+                                            },
+                                            onClose: () => {
+                                                self.resetButton();
+                                            }
+                                        });
+                                    });
+                                } else if (data.redirect_url) {
+                                    // Jika ada redirect_url, pindah halaman
+                                    window.location.href = data.redirect_url;
+                                } else {
+                                    throw new Error('Respons tidak valid dari server.');
+                                }
+                            })
+                            .catch(error => {
+                                this.errorMessage = error.message ||
+                                    'Terjadi kesalahan. Cek kembali isian Anda.';
+                                if (error.errors) {
+                                    this.errorMessage = Object.values(error.errors)[0][0];
+                                }
+                                this.resetButton();
+                            });
+                    },
+
+                    resetButton() {
+                        this.isLoading = false;
+                        this.buttonLabel = 'Lanjutkan Pesanan';
+                    }
+                }));
+            });
+        </script>
+    @endpush
 </x-public-layout>

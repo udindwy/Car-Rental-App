@@ -30,6 +30,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'role' => 'admin',
         ]);
+
+        User::factory()->create([
+            'name' => 'Customer User',
+            'email' => 'customer@example.com',
+            'role' => 'customer', 
+        ]);
+
+        // Buat 10 customer acak lainnya
         User::factory(10)->create();
 
         // 2. Buat Data Master Armada
@@ -72,7 +80,7 @@ class DatabaseSeeder extends Seeder
             'site_name' => 'Car Rental',
             'whatsapp' => '6281234567890',
             'email' => 'kontak@carrental.com',
-            'address' => 'Jl. Malioboro No. 1, Yogyakarta',
+        'address' => 'Jl. Malioboro No. 1, Yogyakarta',
             'phone' => '0274123456',
         ]);
     }

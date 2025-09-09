@@ -35,7 +35,7 @@
                             Status</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tanggal</th>
+                            Tanggal Bayar</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -70,7 +70,14 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $payment->paid_at->format('d M Y, H:i') }}</td>
+                                {{-- ▼▼▼ PERBAIKAN DILAKUKAN DI SINI ▼▼▼ --}}
+                                @if ($payment->paid_at)
+                                    {{ $payment->paid_at->format('d M Y, H:i') }}
+                                @else
+                                    -
+                                @endif
+                                {{-- ▲▲▲ ============================== ▲▲▲ --}}
+                            </td>
                         </tr>
                     @empty
                         <tr>

@@ -43,6 +43,11 @@ Route::controller(CheckoutController::class)->middleware('auth')->group(function
     Route::post('/checkout', 'store')->name('checkout.store');
 });
 
+Route::controller(CheckoutController::class)->middleware('auth')->prefix('booking')->name('booking.')->group(function () {
+    Route::get('/transfer/{booking}', 'transferInstruction')->name('transfer');
+    Route::get('/cash/{booking}', 'cashSuccess')->name('cash');
+});
+
 // Halaman Statis
 Route::controller(PublicPageController::class)->group(function () {
     Route::get('/tentang-kami', 'about')->name('about');
