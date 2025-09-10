@@ -4,26 +4,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
 // --- Public Controllers ---
-use App\Http\Controllers\Public\PageController as PublicPageController;
-use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
-use App\Http\Controllers\Public\CheckoutController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BrandController;
 
 // --- Admin Controllers ---
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\VehicleController;
-use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\BranchController;
-use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\ExtraController;
-use App\Http\Controllers\Admin\BookingController;
-use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\ReviewController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\PageController;
-use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\FeatureController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\VehicleController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Public\CheckoutController;
+use App\Http\Controllers\CustomerDashboardController;
+use App\Http\Controllers\Public\PageController as PublicPageController;
+use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,9 +60,7 @@ Route::controller(PublicPageController::class)->group(function () {
 
 // == AUTHENTICATED CUSTOMER ROUTES ==
 Route::middleware(['auth', 'verified', 'redirect.if.admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
