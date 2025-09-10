@@ -8,14 +8,27 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerDashboardController extends Controller
 {
+
     public function index()
     {
-        // Ambil booking HANYA untuk user yang sedang login
         $bookings = Booking::where('user_id', Auth::id())
-            ->with(['vehicle.brand', 'payment']) // Eager load untuk performa
-            ->latest() // Urutkan dari yang terbaru
-            ->paginate(10); // Paginasi
+            ->with(['vehicle.brand', 'payment'])
+            ->latest()
+            ->paginate(10);
 
         return view('dashboard', compact('bookings'));
+    }
+
+    public function showBookingDetail(Booking $booking)
+    {
+        // Keamanan: Pastikan user hanya bisa melihat booking miliknya sendiri
+        if ($booking->user_id !== Auth::id()) {
+            abort(403, 'AKSES DITOLAK');
+        }
+
+        // Eager load semua relasi yang dibutuhkan
+        $booking->load(['vehicle.brand', 'vehicle.images', 'payment', 'extras', 'pickupBranch', 'dropoffBranch']);
+
+        return view('public.booking-detail', compact('booking'));
     }
 }

@@ -4,15 +4,12 @@
     </x-slot>
 
     @php
-        // Kalkulasi ringkasan pembayaran di sini agar mudah digunakan
-        $totalPaid = $booking->payments->where('status', 'paid')->sum('amount');
-        $totalRefunded = $booking->payments->where('status', 'refunded')->sum('amount');
-        $netPaid = $totalPaid - $totalRefunded;
+        // Kalkulasi ringkasan disesuaikan untuk relasi hasOne
+        $netPaid = $booking->payment && $booking->payment->status == 'paid' ? $booking->payment->amount : 0;
         $outstanding = $booking->grand_total - $netPaid;
     @endphp
 
     <div class="space-y-6">
-        <!-- Form Utama: Edit Detail Pesanan -->
         <div class="p-6 bg-white rounded-lg shadow-lg">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-gray-800">Edit Detail Pesanan</h2>
@@ -31,7 +28,6 @@
                 @csrf
                 @method('PUT')
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Kolom Kiri -->
                     <div>
                         <div>
                             <label for="user_id" class="block text-sm font-medium text-gray-700">Pelanggan</label>
@@ -51,18 +47,17 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div class="mt-4">
-                            <label for="status" class="block text-sm font-medium text-gray-700">Status Pesanan</o>
-                                <select name="status" id="status"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
-                                    <option value="pending" @selected($booking->status == 'pending')>Pending</option>
-                                    <option value="confirmed" @selected($booking->status == 'confirmed')>Confirmed</option>
-                                    <option value="on_rent" @selected($booking->status == 'on_rent')>On Rent</option>
-                                    <option value="completed" @selected($booking->status == 'completed')>Completed</option>
-                                    <option value="cancelled" @selected($booking->status == 'cancelled')>Cancelled</option>
-                                </select>
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status Pesanan</label>
+                            <select name="status" id="status"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                                <option value="pending" @selected($booking->status == 'pending')>Pending</option>
+                                <option value="confirmed" @selected($booking->status == 'confirmed')>Confirmed</option>
+                                <option value="on_rent" @selected($booking->status == 'on_rent')>On Rent</option>
+                                <option value="completed" @selected($booking->status == 'completed')>Completed</option>
+                                <option value="cancelled" @selected($booking->status == 'cancelled')>Cancelled</option>
+                            </select>
                         </div>
                     </div>
-                    <!-- Kolom Kanan -->
                     <div>
                         <div>
                             <label for="vehicle_id" class="block text-sm font-medium text-gray-700">Mobil</label>
@@ -95,13 +90,13 @@
             </form>
         </div>
 
-        <!-- Bagian Pembayaran -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Riwayat Pembayaran -->
             <div class="p-6 bg-white rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Riwayat Pembayaran</h2>
                 <div class="space-y-3">
-                    @forelse($booking->payments as $payment)
+
+                    @if ($booking->payment)
+                        @php $payment = $booking->payment; @endphp
                         <div
                             class="flex justify-between items-center p-3 rounded-md {{ $payment->status == 'refunded' ? 'bg-red-50' : 'bg-green-50' }}">
                             <div>
@@ -110,7 +105,12 @@
                                     {{ $payment->status == 'refunded' ? 'Refund' : 'Pembayaran Diterima' }}
                                 </p>
                                 <small class="text-gray-500">{{ ucfirst($payment->method) }} -
-                                    {{ $payment->paid_at->format('d M Y, H:i') }}</small>
+                                    @if ($payment->paid_at)
+                                        {{ $payment->paid_at->format('d M Y, H:i') }}
+                                    @else
+                                        -
+                                    @endif
+                                </small>
                             </div>
                             <p
                                 class="font-bold {{ $payment->status == 'refunded' ? 'text-red-700' : 'text-green-700' }}">
@@ -118,9 +118,10 @@
                                 {{ number_format($payment->amount) }}
                             </p>
                         </div>
-                    @empty
+                    @else
                         <p class="text-sm text-gray-500">Belum ada riwayat pembayaran.</p>
-                    @endforelse
+                    @endif
+
                 </div>
                 <div class="mt-4 pt-4 border-t">
                     <div class="flex justify-between font-bold">
@@ -138,7 +139,6 @@
                 </div>
             </div>
 
-            <!-- Form Catat Pembayaran Baru -->
             <div class="p-6 bg-white rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Catat Pembayaran Baru</h2>
                 <form action="{{ route('admin.bookings.payments.store', $booking) }}" method="POST">
@@ -148,6 +148,7 @@
                             <label for="payment_amount" class="block text-sm font-medium text-gray-700">Jumlah Bayar
                                 (Rp)</label>
                             <input type="number" name="payment_amount" id="payment_amount"
+                                value="{{ old('payment_amount', $outstanding > 0 ? $outstanding : '') }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
                         </div>
                         <div>
@@ -177,7 +178,6 @@
             </div>
         </div>
 
-        <!-- Aksi Pembatalan & Refund -->
         <div class="p-6 bg-white rounded-lg shadow-lg border-t-4 border-red-500">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Aksi Pembatalan & Refund</h2>
             <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST"

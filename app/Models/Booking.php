@@ -68,57 +68,45 @@ class Booking extends Model
     }
 
 
-    /**
-     * Get the user that owns the booking.
-     */
+    // --- RELASI-RELASI MODEL ---
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vehicle for the booking.
-     */
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class);
     }
 
-    /**
-     * Get the pickup branch for the booking.
-     */
     public function pickupBranch()
     {
         return $this->belongsTo(Branch::class, 'branch_pickup_id');
     }
 
-    /**
-     * Get the dropoff branch for the booking.
-     */
     public function dropoffBranch()
     {
         return $this->belongsTo(Branch::class, 'branch_dropoff_id');
     }
 
     /**
-     * Get the payments for the booking.
+     * Get the payment record associated with the booking.
+     * * [PERBAIKAN DI SINI]
+     * Mengubah nama dari 'payments' menjadi 'payment' (singular)
+     * Mengubah tipe relasi dari hasMany menjadi hasOne
      */
-    public function payments()
+    public function payment()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasOne(Payment::class);
     }
 
-    /**
-     * Get the extras for the booking.
-     */
     public function extras()
     {
-        return $this->belongsToMany(Extra::class)->withPivot('qty', 'price', 'total');
+        // Nama tabel pivot 'booking_extra' sudah sesuai konvensi, jadi tidak perlu disebut
+        return $this->belongsToMany(Extra::class)->withPivot('price', 'total');
     }
 
-    /**
-     * Get the coupon associated with the booking.
-     */
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);

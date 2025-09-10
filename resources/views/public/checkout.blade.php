@@ -4,11 +4,12 @@
 
         <form x-data="checkoutForm" @submit.prevent="submit" enctype="multipart/form-data" id="checkoutForm">
             @csrf
+
             {{-- Menampilkan error validasi dari server --}}
             @if ($errors->any())
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6"
                     role="alert">
-                    <strong class="font-bold">Oops! Terjadi kesalahan.</strong>
+                    <strong class="font-bold">Oops! Terjadi kesalahan validasi.</strong>
                     <ul class="mt-2 list-disc list-inside text-sm">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -24,7 +25,11 @@
             @foreach ($extraIds as $extraId)
                 <input type="hidden" name="extras[]" value="{{ $extraId }}">
             @endforeach
-            <input type="hidden" name="grand_total" value="{{ $priceDetails['total_price'] }}">
+            {{-- Nilai grand_total diupdate oleh AlpineJS --}}
+            <input type="hidden" name="grand_total" x-model="finalTotal">
+            {{-- Menyimpan kode kupon yang valid untuk dikirim ke controller --}}
+            <input type="hidden" name="coupon_code" x-model="appliedCouponCode">
+
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
 
@@ -121,26 +126,48 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 border-t pt-4 space-y-2">
-                            <div class="flex justify-between text-sm">
+                        <div class="mt-4 border-t pt-4 space-y-2 text-sm">
+                            <div class="flex justify-between">
                                 <span class="text-neutral-gray">Sewa Mobil ({{ $priceDetails['duration'] }}
                                     hari)</span>
-                                <span class="font-medium">Rp
+                                <span class="font-medium text-slate-700">Rp
                                     {{ number_format($priceDetails['subtotal'], 0, ',', '.') }}</span>
                             </div>
                             @if ($priceDetails['extras_cost'] > 0)
-                                <div class="flex justify-between text-sm">
+                                <div class="flex justify-between">
                                     <span class="text-neutral-gray">Layanan Tambahan</span>
-                                    <span class="font-medium">Rp
+                                    <span class="font-medium text-slate-700">Rp
                                         {{ number_format($priceDetails['extras_cost'], 0, ',', '.') }}</span>
                                 </div>
                             @endif
+
+                            <div x-show="discountAmount > 0" x-transition class="flex justify-between text-green-600">
+                                <span class="font-medium">Diskon (<span x-text="appliedCouponCode"></span>)</span>
+                                <span class="font-medium"
+                                    x-text="`- Rp ${new Intl.NumberFormat('id-ID').format(discountAmount)}`"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 border-t pt-4">
+                            <label for="coupon" class="block text-sm font-semibold text-slate-700">Kode
+                                Kupon</label>
+                            <div class="mt-1 flex rounded-md shadow-sm">
+                                <input type="text" name="coupon" id="coupon" x-model="couponCode"
+                                    placeholder="Masukkan kode promo"
+                                    class="flex-1 block w-full rounded-none rounded-l-md border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                                <button @click.prevent="applyCoupon" type="button"
+                                    class="inline-flex items-center px-4 py-2 border border-l-0 border-blue-600 rounded-r-md bg-blue-600 text-white hover:bg-blue-700">
+                                    Terapkan
+                                </button>
+                            </div>
+                            <p x-show="couponMessage" :class="isCouponSuccess ? 'text-green-600' : 'text-red-600'"
+                                class="text-sm mt-2" x-text="couponMessage"></p>
                         </div>
 
                         <div class="mt-4 border-t pt-4 flex justify-between items-center">
                             <span class="text-lg font-bold text-dark-slate">Total Biaya</span>
-                            <span class="text-xl font-extrabold text-blue-600">Rp
-                                {{ number_format($priceDetails['total_price'], 0, ',', '.') }}</span>
+                            <span class="text-xl font-extrabold text-blue-600"
+                                x-text="`Rp ${new Intl.NumberFormat('id-ID').format(finalTotal)}`"></span>
                         </div>
 
                         <button type="submit" x-text="buttonLabel" :disabled="isLoading"
@@ -165,18 +192,54 @@
                     buttonLabel: 'Lanjutkan Pesanan',
                     errorMessage: '',
 
-                    loadSnapScript() {
-                        return new Promise((resolve, reject) => {
-                            if (window.snap) return resolve();
-                            const script = document.createElement('script');
-                            script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
-                            script.setAttribute('data-client-key',
-                                "{{ config('midtrans.client_key') }}");
-                            script.onload = resolve;
-                            script.onerror = () => reject(new Error(
-                                'Gagal memuat script pembayaran.'));
-                            document.head.appendChild(script);
-                        });
+                    couponCode: '',
+                    appliedCouponCode: '',
+                    couponMessage: '',
+                    isCouponSuccess: false,
+                    baseTotal: {{ $priceDetails['total_price'] }},
+                    discountAmount: 0,
+
+                    get finalTotal() {
+                        const total = this.baseTotal - this.discountAmount;
+                        return total > 0 ? total : 0;
+                    },
+
+                    applyCoupon() {
+                        this.couponMessage = 'Memvalidasi...';
+                        this.isCouponSuccess = false;
+
+                        fetch('{{ route('api.coupons.validate') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+                                },
+                                body: JSON.stringify({
+                                    coupon_code: this.couponCode,
+                                    total_price: this.baseTotal // Kirim harga sebelum diskon
+                                })
+                            })
+                            .then(res => res.json().then(data => ({
+                                ok: res.ok,
+                                data
+                            })))
+                            .then(({
+                                ok,
+                                data
+                            }) => {
+                                if (!ok) throw data;
+                                this.isCouponSuccess = true;
+                                this.couponMessage = `Kupon "${data.coupon.code}" berhasil diterapkan!`;
+                                this.discountAmount = data.discount_amount;
+                                this.appliedCouponCode = data.coupon.code;
+                            })
+                            .catch(error => {
+                                this.isCouponSuccess = false;
+                                this.couponMessage = error.message || 'Kupon tidak valid.';
+                                this.discountAmount = 0;
+                                this.appliedCouponCode = '';
+                            });
                     },
 
                     submit(event) {
@@ -187,14 +250,13 @@
                         const form = event.target;
                         const formData = new FormData(form);
                         const self = this;
+                        const paymentMethod = formData.get('payment_method');
 
-                        // SEMUA metode sekarang menggunakan fetch
                         fetch(form.action, {
                                 method: 'POST',
                                 body: formData,
                                 headers: {
-                                    'Accept': 'application/json',
-                                    'X-CSRF-TOKEN': form.querySelector('input[name=_token]').value
+                                    'Accept': 'application/json'
                                 }
                             })
                             .then(res => res.json().then(data => ({
@@ -207,40 +269,27 @@
                             }) => {
                                 if (!ok) throw data;
 
-                                // Cek respons dari controller
                                 if (data.snap_token) {
-                                    // Jika ada snap_token, buka Midtrans
-                                    return this.loadSnapScript().then(() => {
-                                        window.snap.pay(data.snap_token, {
-                                            onSuccess: (result) => window.location
-                                                .href =
-                                                `{{ route('home') }}?booking_ref=${result.order_id}&status=success`,
-                                            onPending: (result) => window.location
-                                                .href =
-                                                `{{ route('home') }}?booking_ref=${result.order_id}&status=pending`,
-                                            onError: (result) => {
-                                                self.errorMessage =
-                                                    'Pembayaran gagal. Silakan coba lagi.';
-                                                self.resetButton();
-                                            },
-                                            onClose: () => {
-                                                self.resetButton();
-                                            }
-                                        });
+                                    snap.pay(data.snap_token, {
+                                        onSuccess: (result) => window.location.href =
+                                            `/?booking_ref=${result.order_id}&status=success`,
+                                        onPending: (result) => window.location.href =
+                                            `/?booking_ref=${result.order_id}&status=pending`,
+                                        onError: (result) => {
+                                            self.errorMessage = 'Pembayaran gagal.';
+                                            self.resetButton();
+                                        },
+                                        onClose: () => self.resetButton()
                                     });
                                 } else if (data.redirect_url) {
-                                    // Jika ada redirect_url, pindah halaman
                                     window.location.href = data.redirect_url;
                                 } else {
                                     throw new Error('Respons tidak valid dari server.');
                                 }
                             })
                             .catch(error => {
-                                this.errorMessage = error.message ||
-                                    'Terjadi kesalahan. Cek kembali isian Anda.';
-                                if (error.errors) {
-                                    this.errorMessage = Object.values(error.errors)[0][0];
-                                }
+                                this.errorMessage = error.message || 'Terjadi kesalahan.';
+                                if (error.errors) this.errorMessage = Object.values(error.errors)[0][0];
                                 this.resetButton();
                             });
                     },

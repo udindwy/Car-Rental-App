@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Payment;
+use App\Models\Branch;
 use App\Models\User;
 use App\Models\Vehicle;
-use App\Models\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -57,7 +56,9 @@ class BookingController extends Controller
      */
     public function edit(Booking $booking)
     {
-        $booking->load('payments');
+        // [PERBAIKAN] Menggunakan relasi singular 'payment'
+        $booking->load('payment');
+
         $users = User::where('role', 'customer')->get();
         $vehicles = Vehicle::all();
         $branches = Branch::all();
@@ -98,7 +99,7 @@ class BookingController extends Controller
      */
     public function generateInvoice(Booking $booking)
     {
-        $booking->load('user', 'vehicle.brand');
+        $booking->load('user', 'vehicle.brand', 'payment');
         $pdf = Pdf::loadView('admin.bookings.invoice', compact('booking'));
         return $pdf->stream('invoice-' . $booking->id . '.pdf');
     }
@@ -114,21 +115,26 @@ class BookingController extends Controller
             'notes' => 'nullable|string|max:255',
         ]);
 
-        $booking->payments()->create([
-            'amount' => $request->payment_amount,
-            'method' => $request->payment_method,
-            'status' => 'paid',
-            'paid_at' => now(),
-            'reference' => $request->notes,
-        ]);
+        // [PERBAIKAN] Menggunakan relasi 'payment()' dan metode 'updateOrCreate' untuk hasOne
+        $booking->payment()->updateOrCreate(
+            ['booking_id' => $booking->id], // Kunci untuk mencari data payment
+            [ // Data untuk di-update atau di-create
+                'amount' => $request->payment_amount,
+                'method' => $request->payment_method,
+                'status' => 'paid',
+                'paid_at' => now(),
+                'reference' => $request->notes,
+            ]
+        );
 
-        $totalPaid = $booking->payments()->where('status', 'paid')->sum('amount');
-        $totalRefunded = $booking->payments()->where('status', 'refunded')->sum('amount');
-        $netPaid = $totalPaid - $totalRefunded;
+        // Muat ulang relasi untuk mendapatkan data terbaru
+        $booking->load('payment');
+        $paymentAmount = $booking->payment ? $booking->payment->amount : 0;
 
-        if ($netPaid >= $booking->grand_total) {
+        // [PERBAIKAN] Logika status pembayaran disesuaikan untuk hasOne
+        if ($paymentAmount >= $booking->grand_total) {
             $booking->payment_status = 'paid';
-        } elseif ($netPaid > 0) {
+        } elseif ($paymentAmount > 0) {
             $booking->payment_status = 'partial';
         } else {
             $booking->payment_status = 'unpaid';
@@ -151,13 +157,21 @@ class BookingController extends Controller
 
         $booking->update(['status' => 'cancelled']);
 
-        $booking->payments()->create([
-            'amount' => $request->refund_amount,
-            'method' => $request->refund_method,
-            'status' => 'refunded',
-            'paid_at' => now(),
-            'reference' => $request->notes,
-        ]);
+        // [PERBAIKAN] Menggunakan relasi 'payment()' dan metode 'updateOrCreate' untuk hasOne
+        $booking->payment()->updateOrCreate(
+            ['booking_id' => $booking->id],
+            [
+                'amount' => $request->refund_amount,
+                'method' => $request->refund_method,
+                'status' => 'refunded',
+                'paid_at' => now(),
+                'reference' => $request->notes,
+            ]
+        );
+
+        // Set status pembayaran menjadi 'unpaid' atau sesuai logika bisnis setelah refund
+        $booking->payment_status = 'unpaid';
+        $booking->save();
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'Pesanan berhasil dibatalkan dan refund dicatat.');

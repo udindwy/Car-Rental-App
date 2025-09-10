@@ -61,7 +61,7 @@ Route::controller(PublicPageController::class)->group(function () {
 // == AUTHENTICATED CUSTOMER ROUTES ==
 Route::middleware(['auth', 'verified', 'redirect.if.admin'])->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('/dashboard/booking/{booking}', [CustomerDashboardController::class, 'showBookingDetail'])->name('booking.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
