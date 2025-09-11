@@ -26,7 +26,7 @@
                 <input type="hidden" name="extras[]" value="{{ $extraId }}">
             @endforeach
             {{-- Nilai grand_total diupdate oleh AlpineJS --}}
-            <input type="hidden" name="grand_total" x-model="finalTotal">
+            <input type="hidden" name="grand_total" :value="finalTotal">
             {{-- Menyimpan kode kupon yang valid untuk dikirim ke controller --}}
             <input type="hidden" name="coupon_code" x-model="appliedCouponCode">
 
@@ -141,11 +141,13 @@
                                 </div>
                             @endif
 
-                            <div x-show="discountAmount > 0" x-transition class="flex justify-between text-green-600">
-                                <span class="font-medium">Diskon (<span x-text="appliedCouponCode"></span>)</span>
-                                <span class="font-medium"
-                                    x-text="`- Rp ${new Intl.NumberFormat('id-ID').format(discountAmount)}`"></span>
-                            </div>
+                            <template x-if="discountAmount > 0">
+                                <div x-transition class="flex justify-between text-green-600">
+                                    <span class="font-medium">Diskon (<span x-text="appliedCouponCode"></span>)</span>
+                                    <span class="font-bold"
+                                        x-text="`- Rp ${new Intl.NumberFormat('id-ID').format(discountAmount)}`"></span>
+                                </div>
+                            </template>
                         </div>
 
                         <div class="mt-4 border-t pt-4">
@@ -217,7 +219,7 @@
                                 },
                                 body: JSON.stringify({
                                     coupon_code: this.couponCode,
-                                    total_price: this.baseTotal // Kirim harga sebelum diskon
+                                    total_price: this.baseTotal
                                 })
                             })
                             .then(res => res.json().then(data => ({
@@ -231,7 +233,7 @@
                                 if (!ok) throw data;
                                 this.isCouponSuccess = true;
                                 this.couponMessage = `Kupon "${data.coupon.code}" berhasil diterapkan!`;
-                                this.discountAmount = data.discount_amount;
+                                this.discountAmount = parseFloat(data.discount_amount);
                                 this.appliedCouponCode = data.coupon.code;
                             })
                             .catch(error => {
@@ -250,13 +252,13 @@
                         const form = event.target;
                         const formData = new FormData(form);
                         const self = this;
-                        const paymentMethod = formData.get('payment_method');
 
                         fetch(form.action, {
                                 method: 'POST',
                                 body: formData,
                                 headers: {
-                                    'Accept': 'application/json'
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': form.querySelector('input[name=_token]').value
                                 }
                             })
                             .then(res => res.json().then(data => ({
