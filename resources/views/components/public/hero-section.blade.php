@@ -1,7 +1,6 @@
 {{-- File: resources/views/components/public/hero-section.blade.php --}}
 
-<div
-    class="relative min-h-[600px] overflow-hidden bg-gradient-to-r from-slate-900 via-blue-900 to-blue-800 flex items-center">
+<div class="relative min-h-[600px] overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center">
     <div class="container mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
 
@@ -10,13 +9,13 @@
 
                 {{-- Brand --}}
                 <div data-aos="fade-right">
-                    <h1 class="text-4xl font-extrabold tracking-tight text-blue-600 mb-4">
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white mb-4 sm:text-5xl">
                         CarRental
                     </h1>
                 </div>
 
                 {{-- Deskripsi --}}
-                <p class="mt-4 max-w-2xl text-lg text-slate-600" data-aos="fade-right" data-aos-delay="100">
+                <p class="mt-4 max-w-2xl text-lg text-blue-100" data-aos="fade-right" data-aos-delay="100">
                     Solusi terpercaya untuk kebutuhan transportasi Anda di Jogja. Nikmati perjalanan yang nyaman dengan
                     armada terbaik dan driver berpengalaman.
                 </p>
@@ -26,8 +25,8 @@
                     data-aos-delay="200">
                     @foreach (['Driver Berpengalaman', 'Armada Terawat', 'Harga Terjangkau', 'Support 24/7'] as $item)
                         <div
-                            class="flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-                            <i class="lucide-check-circle text-lg text-blue-600"></i>
+                            class="flex items-center gap-3 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/30 hover:-translate-y-1">
+                            <i class="lucide-check-circle text-lg text-amber-400"></i>
                             <span>{{ $item }}</span>
                         </div>
                     @endforeach
@@ -36,57 +35,43 @@
                 {{-- Tombol CTA --}}
                 <div class="mt-12" data-aos="fade-up" data-aos-delay="300">
                     <a href="{{ route('catalog') }}"
-                        class="inline-flex items-center justify-center rounded-full border-2 border-transparent 
-              bg-blue-600 px-8 py-3 text-base font-bold leading-none text-white 
-              transition-all duration-300 hover:bg-blue-700 focus:outline-none 
-              focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        class="inline-flex items-center justify-center rounded-lg border-2 border-transparent 
+                        bg-amber-400 px-8 py-3 text-base font-bold leading-none text-slate-900 
+                        shadow-lg shadow-amber-500/30 transition-all duration-300 hover:scale-105 hover:bg-amber-500 
+                        focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-indigo-600">
                         Booking Sekarang
                     </a>
                 </div>
 
-
             </div>
 
             {{-- ========== KANAN: Gambar Mobil & Latar ========== --}}
-            <div
-                class="relative flex h-[350px] items-center justify-center overflow-hidden sm:h-[450px] lg:h-auto lg:justify-end">
+            <div class="relative flex h-[350px] items-center justify-center sm:h-[450px] lg:h-auto lg:justify-end">
 
-                {{-- Lingkaran animasi --}}
-                <div
-                    class="animate-pulse-slow absolute -right-16 top-1/2 h-[450px] w-[450px] -translate-y-1/2 rounded-full bg-amber-400 mix-blend-screen opacity-70">
-                </div>
-
-                {{-- Ikon gedung dekoratif --}}
-                <div class="absolute bottom-0 right-0 z-0 opacity-40">
-                    <i class="lucide-building text-[250px] text-slate-800/50"></i>
-                </div>
-
-                {{-- Gambar Armada --}}
+                {{-- Gambar Armada dengan animasi float dan fade-left --}}
                 <img src="{{ Storage::url('vehicles/home.png') }}" alt="Armada CarRental"
-                    class="relative z-10 w-full max-w-xl object-contain drop-shadow-2xl" data-aos="zoom-in"
-                    data-aos-delay="400">
+                    class="animate-float relative z-10 w-full max-w-xl object-contain drop-shadow-2xl"
+                    data-aos="fade-left" data-aos-delay="400">
             </div>
         </div>
     </div>
 </div>
 
-{{-- Animasi Lingkaran --}}
+{{-- Animasi Mobil Mengambang --}}
 <style>
-    @keyframes pulse-slow {
+    @keyframes float {
 
         0%,
         100% {
-            transform: scale(0.95) translateY(-50%);
-            opacity: 0.7;
+            transform: translateY(0);
         }
 
         50% {
-            transform: scale(1.05) translateY(-50%);
-            opacity: 0.85;
+            transform: translateY(-10px);
         }
     }
 
-    .animate-pulse-slow {
-        animation: pulse-slow 6s infinite ease-in-out;
+    .animate-float {
+        animation: float 4s infinite ease-in-out;
     }
 </style>
