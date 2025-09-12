@@ -99,4 +99,16 @@ class VehicleController extends Controller
 
         return response()->json($result);
     }
+
+    public function home()
+    {
+        // Ambil 6 mobil terbaru sebagai mobil unggulan
+        $featuredVehicles = Vehicle::with(['brand', 'images'])
+            ->where('status', 'active')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('public.home', compact('featuredVehicles'));
+    }
 }

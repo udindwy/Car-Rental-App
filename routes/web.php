@@ -35,7 +35,7 @@ use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
 
 // == PUBLIC ROUTES ==
 Route::controller(PublicVehicleController::class)->group(function () {
-    Route::get('/', 'index')->name('home');
+    Route::get('/', 'home')->name('home');
     Route::get('/catalog', 'index')->name('catalog');
     Route::get('/mobil/{vehicle:slug}', 'show')->name('vehicle.show');
 });
