@@ -94,7 +94,7 @@
                                 <p class="text-sm text-slate-500">{{ $booking->vehicle->brand?->name }}</p>
                                 <h3 class="text-lg font-bold text-slate-800">{{ $booking->vehicle->name }}</h3>
                             </div>
-                            <a href="{{ route('home') }}"
+                            <a href="{{ route('dashboard') }}"
                                 class="w-full text-center block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg">
                                 Kembali ke Riwayat
                             </a>

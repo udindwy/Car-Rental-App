@@ -17,22 +17,28 @@
                                 <tr>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        ID Pesanan</th>
+                                        ID Pesanan
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Mobil</th>
+                                        Mobil
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Total Harga</th>
+                                        Total Harga
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Status Booking</th>
+                                        Status Booking
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Status Pembayaran</th>
+                                        Status Pembayaran
+                                    </th>
                                     <th scope="col"
                                         class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        Aksi</th>
+                                        Aksi
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-slate-200">
@@ -77,12 +83,22 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
-                                            <a href="{{ route('booking.show', $booking->id) }}"
-                                                class="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition">
-                                                Lihat Detail
-                                            </a>
+                                            {{-- ▼▼▼ LOGIKA KONDISIONAL UNTUK TOMBOL AKSI ▼▼▼ --}}
+                                            @if ($booking->status === 'completed' && !$booking->review)
+                                                {{-- Jika booking 'completed' DAN belum ada review, tampilkan tombol "Tulis Ulasan" --}}
+                                                <a href="{{ route('review.create', $booking->id) }}"
+                                                    class="inline-block px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
+                                                    Tulis Ulasan
+                                                </a>
+                                            @else
+                                                {{-- Untuk kasus lainnya, tampilkan tombol "Lihat Detail" --}}
+                                                <a href="{{ route('booking.show', $booking->id) }}"
+                                                    class="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                                    Lihat Detail
+                                                </a>
+                                            @endif
+                                            {{-- ▲▲▲ AKHIR LOGIKA KONDISIONAL ▲▲▲ --}}
                                         </td>
-
                                     </tr>
                                 @empty
                                     <tr>

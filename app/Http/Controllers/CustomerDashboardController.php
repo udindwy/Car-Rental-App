@@ -12,7 +12,7 @@ class CustomerDashboardController extends Controller
     public function index()
     {
         $bookings = Booking::where('user_id', Auth::id())
-            ->with(['vehicle.brand', 'payment'])
+            ->with(['vehicle.brand', 'payment', 'review'])
             ->latest()
             ->paginate(10);
 

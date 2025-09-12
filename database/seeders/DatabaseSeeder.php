@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Customer User',
             'email' => 'customer@example.com',
-            'role' => 'customer', 
+            'role' => 'customer',
         ]);
 
         // Buat 10 customer acak lainnya
@@ -56,7 +56,27 @@ class DatabaseSeeder extends Seeder
 
         // 4. Buat Data Transaksional
         Booking::factory(50)->create();
-        Review::factory(30)->create();
+
+        // ▼▼▼ BAGIAN YANG DIPERBAIKI ▼▼▼
+        // Review::factory(30)->create(); // <-- INI PENYEBAB ERROR
+
+        // 1. Ambil booking yang statusnya 'completed' dan belum punya review.
+        $bookingsToReview = Booking::where('status', 'completed')
+            ->doesntHave('review')
+            ->inRandomOrder()
+            ->limit(30) // 2. Batasi jumlah ulasan yang dibuat agar sesuai keinginan.
+            ->get();
+
+        // 3. Looping untuk membuat ulasan satu per satu untuk setiap booking yang valid.
+        foreach ($bookingsToReview as $booking) {
+            Review::factory()->create([
+                'booking_id' => $booking->id,
+                'user_id' => $booking->user_id,
+                'vehicle_id' => $booking->vehicle_id,
+            ]);
+        }
+        // ▲▲▲ AKHIR BAGIAN YANG DIPERBAIKI ▲▲▲
+
         Payment::factory(40)->create();
         Coupon::factory(10)->create();
 
@@ -80,7 +100,7 @@ class DatabaseSeeder extends Seeder
             'site_name' => 'Car Rental',
             'whatsapp' => '6281234567890',
             'email' => 'kontak@carrental.com',
-        'address' => 'Jl. Malioboro No. 1, Yogyakarta',
+            'address' => 'Jl. Malioboro No. 1, Yogyakarta',
             'phone' => '0274123456',
         ]);
     }

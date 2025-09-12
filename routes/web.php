@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Public\ReviewController as PublicReviewController;
 
 // --- Admin Controllers ---
 use App\Http\Controllers\Admin\ExtraController;
@@ -34,7 +35,7 @@ use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
 
 // == PUBLIC ROUTES ==
 Route::controller(PublicVehicleController::class)->group(function () {
-    Route::get('/', 'index')->name('home'); // Asumsi method index di VehicleController menampilkan landing page
+    Route::get('/', 'index')->name('home');
     Route::get('/catalog', 'index')->name('catalog');
     Route::get('/mobil/{vehicle:slug}', 'show')->name('vehicle.show');
 });
@@ -62,6 +63,8 @@ Route::controller(PublicPageController::class)->group(function () {
 Route::middleware(['auth', 'verified', 'redirect.if.admin'])->group(function () {
     Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/booking/{booking}', [CustomerDashboardController::class, 'showBookingDetail'])->name('booking.show');
+    Route::get('/booking/{booking}/review', [PublicReviewController::class, 'create'])->name('review.create');
+    Route::post('/review', [PublicReviewController::class, 'store'])->name('review.store');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
