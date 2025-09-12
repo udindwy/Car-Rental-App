@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,7 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', 
+        'role', // Pastikan 'role' ada di sini
     ];
 
     /**
@@ -34,9 +34,9 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -44,5 +44,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * INI ADALAH FUNGSI YANG HILANG
+     *
+     * Cek apakah role user adalah 'admin' atau 'staff'.
+     *
+     * @return bool
+     */
+    public function isAdminOrStaff(): bool
+    {
+        // Fungsi ini akan mengembalikan true jika role user adalah 'admin' ATAU 'staff'
+        return $this->role === 'admin' || $this->role === 'staff';
     }
 }
