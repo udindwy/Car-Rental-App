@@ -35,12 +35,23 @@
                         </div>
                         <div class="md:col-span-2">
                             <label for="logo" class="block text-sm font-medium text-gray-700">Logo Situs</label>
+
                             @if ($settings->logo && Illuminate\Support\Facades\Storage::disk('public')->exists($settings->logo))
-                                <img src="{{ Illuminate\Support\Facades\Storage::url($settings->logo) }}"
-                                    alt="Logo saat ini" class="h-16 w-auto my-2 bg-gray-100 p-2 rounded">
+                                <div class="mt-2 flex items-center gap-4">
+                                    <img src="{{ Illuminate\Support\Facades\Storage::url($settings->logo) }}"
+                                        alt="Logo saat ini" class="h-16 w-auto bg-gray-100 p-2 rounded">
+
+                                    {{-- Tombol Hapus Logo --}}
+                                    <a href="{{ route('admin.settings.remove-logo') }}"
+                                        onclick="return confirm('Anda yakin ingin menghapus logo ini?');"
+                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition">
+                                        Hapus Logo
+                                    </a>
+                                </div>
                             @endif
+
                             <input type="file" name="logo" id="logo"
-                                class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                             <p class="text-xs text-gray-500 mt-1">Format: PNG, JPG, SVG. Ukuran Maks: 2MB. Biarkan
                                 kosong jika tidak ingin mengubah logo.</p>
                         </div>

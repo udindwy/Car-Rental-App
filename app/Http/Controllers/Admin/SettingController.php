@@ -61,4 +61,22 @@ class SettingController extends Controller
 
         return redirect()->back()->with('success', 'Pengaturan situs berhasil diperbarui.');
     }
+
+    public function removeLogo()
+    {
+        $settings = Setting::first();
+
+        if ($settings->logo && Storage::disk('public')->exists($settings->logo)) {
+            // Hapus file dari storage
+            Storage::disk('public')->delete($settings->logo);
+
+            // Hapus path dari database
+            $settings->logo = null;
+            $settings->save();
+
+            return redirect()->back()->with('success', 'Logo berhasil dihapus.');
+        }
+
+        return redirect()->back()->with('error', 'Logo tidak ditemukan.');
+    }
 }

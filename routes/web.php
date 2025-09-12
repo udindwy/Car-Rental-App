@@ -109,6 +109,7 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])->prefix('admin')->na
     Route::resource('pages', PageController::class);
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::get('settings/remove-logo', [SettingController::class, 'removeLogo'])->name('settings.remove-logo');
 
     // Laporan
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
