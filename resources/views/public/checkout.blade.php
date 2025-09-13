@@ -52,31 +52,79 @@
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100" readonly>
                         </div>
                     </div>
+                    {{-- Ganti input telepon Anda dengan ini --}}
                     <div>
                         <label for="phone" class="block text-sm font-medium text-slate-700">Nomor Telepon</label>
                         <input type="text" id="phone" name="phone" placeholder="Contoh: 08123456789"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            required>
+                            {{-- Isi value dari profil user, jika ada --}} value="{{ auth()->user()->phone_number }}" {{-- Jika sudah ada, buat readonly dan beri style abu-abu --}}
+                            @if (auth()->user()->phone_number) readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
+        @else
+            {{-- Jika belum ada, beri style normal dan wajib diisi --}}
+            required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" @endif>
                     </div>
 
-                    <div class="border-t pt-6 space-y-4">
-                        <div>
-                            <label for="ktp" class="block text-sm font-medium text-slate-700">Upload Foto
-                                KTP</label>
-                            <input type="file" id="ktp" name="ktp"
-                                class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                required>
-                            <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
-                        </div>
-                        <div>
-                            <label for="sim" class="block text-sm font-medium text-slate-700">Upload Foto SIM
-                                A</label>
-                            <input type="file" id="sim" name="sim"
-                                class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                required>
-                            <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
-                        </div>
+                    {{-- ====================================================== --}}
+                    {{-- ▼▼▼ BLOK UPLOAD DOKUMEN YANG SUDAH DIPERBARUI ▼▼▼ --}}
+                    {{-- ====================================================== --}}
+                    <div class="border-t pt-6 space-y-6">
+                        <h3 class="text-lg font-medium text-slate-700">Dokumen Identitas</h3>
+
+                        @if (auth()->user()->ktp_path && auth()->user()->sim_path)
+                            {{-- TAMPILAN JIKA DOKUMEN SUDAH ADA --}}
+                            <div x-data="{ showUpload: false }" class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                                <p class="text-sm font-semibold text-blue-800">Anda sudah memiliki dokumen tersimpan.
+                                </p>
+                                <p class="text-xs text-blue-700">Anda bisa menggunakan dokumen ini atau mengunggah yang
+                                    baru.</p>
+                                <button type="button" @click="showUpload = !showUpload"
+                                    class="mt-2 text-sm font-bold text-blue-600 hover:underline">
+                                    <span x-show="!showUpload">Unggah Dokumen Baru</span>
+                                    <span x-show="showUpload">Gunakan Dokumen Tersimpan</span>
+                                </button>
+
+                                <div x-show="showUpload" x-transition class="mt-4 space-y-4">
+                                    {{-- Form upload opsional jika dokumen sudah ada --}}
+                                    <div>
+                                        <label for="ktp_new" class="block text-sm font-medium text-slate-700">Upload
+                                            Foto KTP Baru</label>
+                                        <input type="file" id="ktp_new" name="ktp"
+                                            class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                        <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
+                                    </div>
+                                    <div>
+                                        <label for="sim_new" class="block text-sm font-medium text-slate-700">Upload
+                                            Foto SIM A Baru</label>
+                                        <input type="file" id="sim_new" name="sim"
+                                            class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                        <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            {{-- TAMPILAN JIKA DOKUMEN BELUM ADA (WAJIB UPLOAD) --}}
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="ktp" class="block text-sm font-medium text-slate-700">Upload Foto
+                                        KTP</label>
+                                    <input type="file" id="ktp" name="ktp"
+                                        class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        required>
+                                    <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
+                                </div>
+                                <div>
+                                    <label for="sim" class="block text-sm font-medium text-slate-700">Upload Foto
+                                        SIM A</label>
+                                    <input type="file" id="sim" name="sim"
+                                        class="mt-2 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                        required>
+                                    <p class="text-xs text-neutral-gray mt-1">Format: JPG, PNG. Max: 2MB.</p>
+                                </div>
+                            </div>
+                        @endif
                     </div>
+                    {{-- ====================================================== --}}
+                    {{-- ▲▲▲ AKHIR BLOK UPLOAD DOKUMEN ▲▲▲ --}}
+                    {{-- ====================================================== --}}
 
                     <div class="border-t pt-6">
                         <h2 class="text-xl font-semibold text-dark-slate">Pilih Metode Pembayaran</h2>

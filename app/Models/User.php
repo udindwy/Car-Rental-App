@@ -20,7 +20,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Pastikan 'role' ada di sini
+        'role',
+        'ktp_path',
+        'sim_path',
+        'phone_number',
     ];
 
     /**
@@ -47,15 +50,12 @@ class User extends Authenticatable
     }
 
     /**
-     * INI ADALAH FUNGSI YANG HILANG
-     *
      * Cek apakah role user adalah 'admin' atau 'staff'.
      *
      * @return bool
      */
     public function isAdminOrStaff(): bool
     {
-        // Fungsi ini akan mengembalikan true jika role user adalah 'admin' ATAU 'staff'
-        return $this->role === 'admin' || $this->role === 'staff';
+        return in_array($this->role, ['admin', 'staff']);
     }
 }

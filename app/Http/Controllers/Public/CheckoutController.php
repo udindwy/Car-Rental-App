@@ -80,6 +80,20 @@ class CheckoutController extends Controller
         $ktpPath = $request->file('ktp')->store('documents', 'public');
         $simPath = $request->file('sim')->store('documents', 'public');
 
+        $user = auth()->user();
+
+        // Sekarang update data user tersebut
+        $user->update([
+            'ktp_path' => $ktpPath,
+            'sim_path' => $simPath,
+        ]);
+
+        if ($user && empty($user->phone_number)) {
+            $user->update([
+                'phone_number' => $validated['phone']
+            ]);
+        }
+
         // Simpan booking
         $booking = Booking::create([
             'user_id'           => auth()->id(),
