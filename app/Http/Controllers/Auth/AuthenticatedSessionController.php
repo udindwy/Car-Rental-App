@@ -28,17 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        
-        $user = Auth::user();
+        $user = $request->user();
 
-        // Periksa peran pengguna dan arahkan ke dasbor yang sesuai
         if ($user->role === 'admin' || $user->role === 'staff') {
-            // Jika admin atau staff, arahkan ke dasbor admin
             return redirect()->intended(route('admin.dashboard'));
-        } else {
-            // Jika bukan, arahkan ke dasbor pelanggan biasa
-            return redirect()->intended(route('dashboard'));
         }
+
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -47,11 +43,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 }

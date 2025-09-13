@@ -57,17 +57,14 @@ class DatabaseSeeder extends Seeder
         // 4. Buat Data Transaksional
         Booking::factory(50)->create();
 
-        // ▼▼▼ BAGIAN YANG DIPERBAIKI ▼▼▼
-        // Review::factory(30)->create(); // <-- INI PENYEBAB ERROR
-
         // 1. Ambil booking yang statusnya 'completed' dan belum punya review.
         $bookingsToReview = Booking::where('status', 'completed')
             ->doesntHave('review')
             ->inRandomOrder()
-            ->limit(30) // 2. Batasi jumlah ulasan yang dibuat agar sesuai keinginan.
+            ->limit(30) 
             ->get();
 
-        // 3. Looping untuk membuat ulasan satu per satu untuk setiap booking yang valid.
+        // 3. Looping untuk membuat ulasan satu per satu untuk  setiap booking yang valid.
         foreach ($bookingsToReview as $booking) {
             Review::factory()->create([
                 'booking_id' => $booking->id,
@@ -75,7 +72,6 @@ class DatabaseSeeder extends Seeder
                 'vehicle_id' => $booking->vehicle_id,
             ]);
         }
-        // ▲▲▲ AKHIR BAGIAN YANG DIPERBAIKI ▲▲▲
 
         Payment::factory(40)->create();
         Coupon::factory(10)->create();
@@ -84,8 +80,8 @@ class DatabaseSeeder extends Seeder
         Page::create([
             'title' => 'Tentang Kami',
             'slug' => 'tentang-kami',
-            'content' => '<h2>Tentang CarRental</h2>' .
-                '<p><strong>CarRental</strong> adalah pilihan utama Anda untuk jasa sewa mobil di Yogyakarta. Berdiri dengan semangat untuk memberikan pengalaman perjalanan yang tak terlupakan, kami berkomitmen untuk menyediakan layanan transportasi yang aman, nyaman, dan terpercaya bagi setiap pelanggan, baik untuk keperluan wisata, bisnis, maupun acara pribadi.</p>' .
+            'content' =>
+            '<p><strong>CarRental</strong> adalah pilihan utama Anda untuk jasa sewa mobil di Yogyakarta. Berdiri dengan semangat untuk memberikan pengalaman perjalanan yang tak terlupakan, kami berkomitmen untuk menyediakan layanan transportasi yang aman, nyaman, dan terpercaya bagi setiap pelanggan, baik untuk keperluan wisata, bisnis, maupun acara pribadi.</p>' .
                 '<h3>Visi & Misi Kami</h3>' .
                 '<p>Visi kami adalah menjadi penyedia jasa rental mobil terdepan di Yogyakarta yang dikenal karena kualitas armada dan pelayanan prima. Misi kami adalah memastikan setiap perjalanan Anda berjalan lancar dengan menyediakan kendaraan yang terawat baik dan dukungan pelanggan yang siap sedia 24/7.</p>' .
                 '<h3>Mengapa Memilih Kami?</h3>' .
@@ -165,6 +161,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'kontak@carrental.com',
             'address' => 'Jl. Malioboro No. 1, Yogyakarta',
             'phone' => '0274123456',
+            'facebook_url' => 'https://facebook.com',
+            'instagram_url' => 'https://instagram.com',
         ]);
     }
 }
