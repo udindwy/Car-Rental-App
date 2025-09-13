@@ -61,4 +61,16 @@ class UserPolicy
     {
         return false;
     }
+
+    /**
+     * Determine whether the user can view revenue data.
+     *
+     * @param  \App\Models\User  $user
+     * @return bool
+     */
+    public function viewRevenue(User $user)
+    {
+        // Only admins can view revenue data
+        return $user->role === 'admin';
+    }
 }
