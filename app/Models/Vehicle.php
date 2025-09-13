@@ -77,9 +77,14 @@ class Vehicle extends Model
     {
         return round($this->reviews()->avg('rating') ?? 0, 1);
     }
-    
+
     public function extras()
     {
         return $this->belongsToMany(Extra::class);
+    }
+
+    public function availabilities()
+    {
+        return $this->hasMany(Availability::class);
     }
 }

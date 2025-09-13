@@ -4,33 +4,41 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
 // --- Public Controllers ---
-use App\Http\Controllers\Admin\PageController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Public\ReviewController as PublicReviewController;
-
-// --- Admin Controllers ---
-use App\Http\Controllers\Admin\ExtraController;
-use App\Http\Controllers\Admin\BranchController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\ReviewController;
-use App\Http\Controllers\Admin\BookingController;
-use App\Http\Controllers\Admin\FeatureController;
-use App\Http\Controllers\Admin\PaymentController;
-use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\VehicleController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Public\CheckoutController;
-use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\Public\PageController as PublicPageController;
 use App\Http\Controllers\Public\VehicleController as PublicVehicleController;
+use App\Http\Controllers\Public\CheckoutController;
+use App\Http\Controllers\Public\ReviewController as PublicReviewController;
+use App\Http\Controllers\CustomerDashboardController;
+
+
+// --- Admin Controllers ---
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\VehicleController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BranchController;
+use App\Http\Controllers\Admin\FeatureController;
+use App\Http\Controllers\Admin\ExtraController;
+use App\Http\Controllers\Admin\AvailabilityController;
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ReportController;
+
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
 */
 
 // == PUBLIC ROUTES ==
@@ -88,13 +96,13 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])->prefix('admin')->na
     Route::get('vehicles/{vehicle}/pricing', [VehicleController::class, 'pricing'])->name('vehicles.pricing');
     Route::post('vehicles/{vehicle}/pricing', [VehicleController::class, 'storePricing'])->name('vehicles.storePricing');
     Route::delete('pricing-rules/{rule}', [VehicleController::class, 'destroyPricing'])->name('pricing-rules.destroy');
-    Route::get('vehicles/{vehicle}/availability', [VehicleController::class, 'availability'])->name('vehicles.availability');
-    Route::post('vehicles/{vehicle}/blackouts', [VehicleController::class, 'storeBlackout'])->name('vehicles.blackouts.store');
-    Route::delete('blackouts/{blackout}', [VehicleController::class, 'destroyBlackout'])->name('blackouts.destroy');
-
-    // ▼▼▼ RUTE BARU DITAMBAHKAN DI SINI ▼▼▼
     Route::post('vehicles/{vehicle}/update-status', [VehicleController::class, 'updateStatus'])->name('vehicles.updateStatus');
 
+    // Manajemen Ketersediaan Mobil
+    Route::get('vehicles/{vehicle}/availability', [AvailabilityController::class, 'index'])->name('vehicles.availability');
+    Route::post('vehicles/{vehicle}/availability', [AvailabilityController::class, 'store'])->name('vehicles.availability.store');
+    Route::delete('availability/{availability}', [AvailabilityController::class, 'destroy'])->name('availability.destroy');
+    // Rute 'availabilities.index' yang menunjuk ke indexAll() telah dihapus karena tidak digunakan.
 
     // Manajemen Transaksi
     Route::resource('bookings', BookingController::class);

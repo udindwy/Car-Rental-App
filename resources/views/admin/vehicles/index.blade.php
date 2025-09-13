@@ -56,47 +56,39 @@
                                 Rp {{ number_format($vehicle->base_price_day) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                {{-- ▼▼▼ BAGIAN TAMPILAN STATUS DISESUAIKAN ▼▼▼ --}}
                                 <span
                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    @if ($vehicle->status == 'active') bg-green-100 text-green-800
-                                    @elseif($vehicle->status == 'inactive') bg-yellow-100 text-yellow-800
+                                    @if ($vehicle->status == 'Tersedia') bg-green-100 text-green-800
+                                    @elseif($vehicle->status == 'Disewa') bg-yellow-100 text-yellow-800
                                     @else bg-gray-100 text-gray-800 @endif">
-
-                                    @if ($vehicle->status == 'active')
-                                        Tersedia
-                                    @elseif($vehicle->status == 'inactive')
-                                        Disewa
-                                    @else
-                                        Dalam Perawatan
-                                    @endif
+                                    {{ $vehicle->status }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end items-center space-x-2">
 
-                                    {{-- ▼▼▼ BAGIAN FORM STATUS DISESUAIKAN ▼▼▼ --}}
+                                    {{-- Form untuk update status --}}
                                     @can('updateStatus', $vehicle)
                                         <form action="{{ route('admin.vehicles.updateStatus', $vehicle) }}" method="POST">
                                             @csrf
                                             <select name="status"
                                                 class="text-xs font-medium rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 
-                                                @if ($vehicle->status == 'active') bg-green-100 text-green-800 border-green-300 
-                                                @elseif($vehicle->status == 'inactive') bg-yellow-100 text-yellow-800 border-yellow-300 
+                                                @if ($vehicle->status == 'Tersedia') bg-green-100 text-green-800 border-green-300 
+                                                @elseif($vehicle->status == 'Disewa') bg-yellow-100 text-yellow-800 border-yellow-300 
                                                 @else bg-gray-100 text-gray-800 border-gray-300 @endif"
                                                 onchange="this.form.submit()">
-
-                                                <option value="active" @if ($vehicle->status == 'active') selected @endif>
+                                                <option value="Tersedia" @if ($vehicle->status == 'Tersedia') selected @endif>
                                                     Tersedia</option>
-                                                <option value="inactive" @if ($vehicle->status == 'inactive') selected @endif>
+                                                <option value="Disewa" @if ($vehicle->status == 'Disewa') selected @endif>
                                                     Disewa</option>
-                                                <option value="maintenance"
-                                                    @if ($vehicle->status == 'maintenance') selected @endif>Dalam Perawatan
+                                                <option value="Dalam Perawatan"
+                                                    @if ($vehicle->status == 'Dalam Perawatan') selected @endif>Dalam Perawatan
                                                 </option>
                                             </select>
                                         </form>
                                     @endcan
 
+                                    {{-- Tombol Edit (Hanya Admin) --}}
                                     @can('update', $vehicle)
                                         <a href="{{ route('admin.vehicles.edit', $vehicle) }}"
                                             class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
@@ -104,10 +96,18 @@
                                         </a>
                                     @endcan
 
+                                    {{-- Tombol Kalender (Admin & Staff) --}}
+                                    @can('viewAny', \App\Models\Availability::class)
+                                        <a href="{{ route('admin.vehicles.availability', $vehicle) }}"
+                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-gray-600 hover:bg-gray-700 transition">
+                                            Kalender
+                                        </a>
+                                    @endcan
+
+                                    {{-- Tombol Hapus (Hanya Admin) --}}
                                     @can('delete', $vehicle)
                                         <form action="{{ route('admin.vehicles.destroy', $vehicle) }}" method="POST"
-                                            class="inline-flex"
-                                            onsubmit="return confirm('Yakin ingin menghapus mobil ini?');">
+                                            class="inline-flex">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

@@ -1,7 +1,5 @@
-<!-- Background overlay for mobile -->
 <div x-show="sidebarOpen" @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/50 lg:hidden" x-cloak></div>
 
-<!-- Sidebar -->
 <aside
     :class="{
         'translate-x-0': sidebarOpen,
@@ -12,23 +10,18 @@
     class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col justify-between overflow-y-auto bg-gradient-to-b from-blue-700 to-blue-800 text-white transition-transform duration-300">
 
     <div>
-        <!-- Logo & Title -->
         <div class="w-full bg-blue-800 border-b border-blue-800">
             <div class="flex flex-col items-center justify-center h-20 px-6">
-                <!-- Logo Mobil -->
                 <svg class="mb-1 h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke-width="1.5" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 003.375-3.375h1.5a1.125 1.125 0 011.125 1.125v-1.5c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 003.375 3.375v1.875a2.25 2.25 0 01-2.25 2.25H5.625a2.25 2.25 0 01-2.25-2.25z" />
                 </svg>
-                <!-- Title -->
                 <span class="text-lg font-bold tracking-wide text-white">Admin Panel</span>
             </div>
         </div>
 
-        <!-- Navigation Links -->
         <nav class="mt-4 space-y-2 px-4">
-            <!-- Dashboard -->
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -39,7 +32,6 @@
                 <span class="ml-4 whitespace-nowrap">Dashboard</span>
             </a>
 
-            <!-- Pemesanan -->
             <a href="{{ route('admin.bookings.index') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                 {{ request()->routeIs('admin.bookings.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -50,7 +42,6 @@
                 <span class="ml-4 whitespace-nowrap">Pemesanan</span>
             </a>
 
-            <!-- Pembayaran -->
             <a href="{{ route('admin.payments.index') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                 {{ request()->routeIs('admin.payments.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -61,7 +52,6 @@
                 <span class="ml-4 whitespace-nowrap">Pembayaran</span>
             </a>
 
-            <!-- Ulasan & Review -->
             <a href="{{ route('admin.reviews.index') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                 {{ request()->routeIs('admin.reviews.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -72,8 +62,7 @@
                 <span class="ml-4 whitespace-nowrap">Ulasan & Review</span>
             </a>
 
-            <!-- Armada Dropdown -->
-            <div x-data="{ open: {{ request()->routeIs(['admin.vehicles.*', 'admin.brands.*', 'admin.categories.*', 'admin.features.*', 'admin.branches.*']) ? 'true' : 'false' }} }">
+            <div x-data="{ open: {{ request()->routeIs(['admin.vehicles.*', 'admin.brands.*', 'admin.categories.*', 'admin.features.*', 'admin.branches.*', 'admin.availabilities.*']) ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex w-full items-center justify-between rounded-lg py-2 px-4 transition-colors duration-200 
                     {{ request()->routeIs([
@@ -82,6 +71,7 @@
                         'admin.categories.*',
                         'admin.features.*',
                         'admin.branches.*',
+                        'admin.availabilities.*',
                     ])
                         ? 'bg-blue-600 font-semibold text-white'
                         : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -103,7 +93,13 @@
                         class="block rounded-lg py-2 px-4 text-sm {{ request()->routeIs('admin.vehicles.*') ? 'font-semibold text-white' : 'text-blue-200 hover:text-white' }}">Daftar
                         Mobil</a>
 
-                    {{-- ▼▼▼ ADMIN ONLY ▼▼▼ --}}
+                    {{-- @can('viewAny', \App\Models\Availability::class)
+                        <a href="{{ route('admin.vehicles.index') }}"
+                            class="block rounded-lg py-2 px-4 text-sm {{ request()->routeIs('admin.availabilities.*') ? 'font-semibold text-white' : 'text-blue-200 hover:text-white' }}">
+                            Ketersediaan
+                        </a>
+                    @endcan --}}
+
                     @can('viewAny', \App\Models\Brand::class)
                         <a href="{{ route('admin.brands.index') }}"
                             class="block rounded-lg py-2 px-4 text-sm {{ request()->routeIs('admin.brands.*') ? 'font-semibold text-white' : 'text-blue-200 hover:text-white' }}">Brand</a>
@@ -122,7 +118,6 @@
 
             {{-- ▼▼▼ SEMUA MENU DI BAWAH INI HANYA UNTUK ADMIN ▼▼▼ --}}
             @can('viewAny', \App\Models\User::class)
-                <!-- Laporan -->
                 <a href="{{ route('admin.reports.index') }}"
                     class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                     {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -133,7 +128,6 @@
                     <span class="ml-4 whitespace-nowrap">Laporan</span>
                 </a>
 
-                <!-- Kupon & Promo -->
                 <a href="{{ route('admin.coupons.index') }}"
                     class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                     {{ request()->routeIs('admin.coupons.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -144,7 +138,6 @@
                     <span class="ml-4 whitespace-nowrap">Kupon & Promo</span>
                 </a>
 
-                <!-- Pengguna -->
                 <a href="{{ route('admin.users.index') }}"
                     class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                     {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -155,7 +148,6 @@
                     <span class="ml-4 whitespace-nowrap">Pengguna</span>
                 </a>
 
-                <!-- Pengaturan Dropdown -->
                 <div x-data="{ open: {{ request()->routeIs(['admin.pages.*', 'admin.settings.*']) ? 'true' : 'false' }} }">
                     <button @click="open = !open"
                         class="flex w-full items-center justify-between rounded-lg py-2 px-4 transition-colors duration-200 
@@ -164,7 +156,7 @@
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M10.343 3.94c.09-.542.56-1.007 1.11-1.226l.28-.082c.55-.16 1.15.026 1.565.44l.287.287c.414.415.602.965.44 1.565l-.082.28c-.22.55-.685 1.02-1.227 1.11a48.454 48.454 0 01-2.822 0c-.542-.09-.997-.56-1.226-1.11l-.082-.28c-.16-.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082zM15.157 15.157c.09.542.56 1.007 1.11 1.226l.28.082c.55.16 1.15-.026 1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455 48.455 0 01-2.822 0c-.542.09-.997.56-1.226 1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082zM8.843 15.157c.09.542.56 1.007 1.11 1.226l.28.082c.55.16 1.15-.026 1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455 48.455 0 01-2.822 0c-.542.09-.997-.56-1.226 1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082z" />
+                                    d="M10.343 3.94c.09-.542.56-1.007 1.11-1.226l.28-.082c.55-.16 1.15.026 1.565.44l.287.287c.414.415.602.965.44 1.565l-.082.28c-.22.55-.685 1.02-1.227 1.11a48.454 48.454 0 01-2.822 0c-.542-.09-.997-.56-1.226-1.11l-.082-.28c-.16-.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082zM15.157 15.157c.09.542.56 1.007 1.11 1.226l.28.082c.55.16 1.15-.026 1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455 48.455 0 01-2.822 0c-.542.09-.997-.56-1.226 1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082zM8.843 15.157c.09.542.56 1.007 1.11 1.226l.28.082c.55.16 1.15-.026 1.565-.44l.287-.287c.414-.415.602-.965.44-1.565l-.082-.28c-.22-.55-.685-1.02-1.227-1.11a48.455 48.455 0 01-2.822 0c-.542.09-.997-.56-1.226 1.11l-.082.28c-.16.55.026-1.15.44-1.565l.287-.287c.415-.414.965-.602 1.565-.44l.28.082z" />
                             </svg>
                             <span class="ml-4 whitespace-nowrap">Pengaturan</span>
                         </div>
