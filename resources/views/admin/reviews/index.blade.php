@@ -51,37 +51,40 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <span
                                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-            {{ $review->approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ $review->approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                     {{ $review->approved ? 'Disetujui' : 'Pending' }}
                                 </span>
                             </td>
                             <td
                                 class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end space-x-2">
-                                <!-- Approve / Cancel -->
-                                <form action="{{ route('admin.reviews.update', $review) }}" method="POST"
-                                    class="inline-block">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit"
-                                        class="px-3 py-1 rounded-md text-sm font-medium 
-                       {{ $review->approved
-                           ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                           : 'bg-green-600 text-white hover:bg-green-700' }}">
-                                        {{ $review->approved ? 'Batal Setujui' : 'Setujui' }}
-                                    </button>
-                                </form>
 
-                                <!-- Delete -->
-                                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST"
-                                    class="inline-block"
-                                    onsubmit="return confirm('Yakin ingin menghapus ulasan ini secara permanen?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="px-3 py-1 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700">
-                                        Hapus
-                                    </button>
-                                </form>
+                                {{-- ▼▼▼ HAK AKSES DITAMBAHKAN DI SINI ▼▼▼ --}}
+                                @can('update', $review)
+                                    <form action="{{ route('admin.reviews.update', $review) }}" method="POST"
+                                        class="inline-block">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit"
+                                            class="px-3 py-1 rounded-md text-sm font-medium 
+                                            {{ $review->approved ? 'bg-yellow-500 text-white hover:bg-yellow-600' : 'bg-green-600 text-white hover:bg-green-700' }}">
+                                            {{ $review->approved ? 'Batal Setujui' : 'Setujui' }}
+                                        </button>
+                                    </form>
+                                @endcan
+
+                                {{-- ▼▼▼ HAK AKSES DITAMBAHKAN DI SINI ▼▼▼ --}}
+                                @can('delete', $review)
+                                    <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST"
+                                        class="inline-block"
+                                        onsubmit="return confirm('Yakin ingin menghapus ulasan ini secara permanen?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-3 py-1 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty
@@ -98,5 +101,4 @@
             {{ $reviews->links() }}
         </div>
     </div>
-
 </x-admin-layout>

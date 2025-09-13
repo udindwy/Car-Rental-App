@@ -16,6 +16,9 @@ class ReviewController extends Controller
 
     public function update(Request $request, Review $review)
     {
+        // ▼▼▼ Otorisasi ditambahkan di sini ▼▼▼
+        $this->authorize('update', $review);
+
         // Aksi ini akan menjadi toggle untuk status 'approved'
         $review->update([
             'approved' => !$review->approved,
@@ -28,6 +31,9 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        // ▼▼▼ Otorisasi ditambahkan di sini ▼▼▼
+        $this->authorize('delete', $review);
+
         $review->delete();
         return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil dihapus.');
     }
