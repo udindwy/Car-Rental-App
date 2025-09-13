@@ -12,6 +12,7 @@ use App\Models\Extra;
 use App\Models\Feature;
 use App\Models\Page;
 use App\Models\User;
+use App\Models\Payment;
 
 // Policies
 use App\Policies\BookingPolicy;
@@ -23,6 +24,7 @@ use App\Policies\ExtraPolicy;
 use App\Policies\FeaturePolicy;
 use App\Policies\PagePolicy;
 use App\Policies\UserPolicy;
+use App\Policies\PaymentPolicy;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -44,6 +46,7 @@ class AuthServiceProvider extends ServiceProvider
         Extra::class      => ExtraPolicy::class,
         Coupon::class     => CouponPolicy::class,
         Page::class       => PagePolicy::class,
+        Payment::class => PaymentPolicy::class,
     ];
 
     /**
