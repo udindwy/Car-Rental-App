@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\Payment;
 use App\Models\Availability;
 use App\Models\Review;
+use App\Models\Report;
 
 // Policies
 use App\Policies\BookingPolicy;
@@ -29,6 +30,7 @@ use App\Policies\UserPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\AvailabilityPolicy;
 use App\Policies\ReviewPolicy;
+use App\Policies\ReportPolicy;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -53,6 +55,7 @@ class AuthServiceProvider extends ServiceProvider
         Payment::class => PaymentPolicy::class,
         Availability::class => AvailabilityPolicy::class,
         Review::class => ReviewPolicy::class,
+        Report::class => ReportPolicy::class,
     ];
 
     /**

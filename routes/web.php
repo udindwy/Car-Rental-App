@@ -102,7 +102,6 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])->prefix('admin')->na
     Route::get('vehicles/{vehicle}/availability', [AvailabilityController::class, 'index'])->name('vehicles.availability');
     Route::post('vehicles/{vehicle}/availability', [AvailabilityController::class, 'store'])->name('vehicles.availability.store');
     Route::delete('availability/{availability}', [AvailabilityController::class, 'destroy'])->name('availability.destroy');
-    // Rute 'availabilities.index' yang menunjuk ke indexAll() telah dihapus karena tidak digunakan.
 
     // Manajemen Transaksi
     Route::resource('bookings', BookingController::class);
@@ -126,7 +125,12 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])->prefix('admin')->na
     // Laporan
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/bookings', [ReportController::class, 'exportBookings'])->name('reports.export.bookings');
-    Route::get('reports/revenue', [ReportController::class, 'exportRevenue'])->name('reports.export.revenue');
+
+    // ▼▼▼ RUTE INI SEKARANG DILINDUNGI ▼▼▼
+    Route::get('reports/revenue', [ReportController::class, 'exportRevenue'])
+        ->name('reports.export.revenue')
+        ->middleware('can:exportRevenue,' . \App\Models\Report::class);
+
     Route::get('reports/occupancy', [ReportController::class, 'exportOccupancy'])->name('reports.export.occupancy');
     Route::get('reports/coupon-usage', [ReportController::class, 'exportCouponUsage'])->name('reports.export.coupon_usage');
 });

@@ -21,7 +21,11 @@
             </div>
         </div>
 
-        <nav class="mt-4 space-y-2 px-4">
+        <nav class="mt-4 space-y-1 px-4">
+
+            {{-- Judul Navigasi --}}
+            <span class="px-4 text-xs font-semibold uppercase text-blue-200 tracking-wider">Navigasi Utama</span>
+
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -31,6 +35,10 @@
                 </svg>
                 <span class="ml-4 whitespace-nowrap">Dashboard</span>
             </a>
+
+            {{-- Judul Manajemen --}}
+            <span class="px-4 pt-4 pb-1 block text-xs font-semibold uppercase text-blue-200 tracking-wider">Manajemen
+                Operasional</span>
 
             <a href="{{ route('admin.bookings.index') }}"
                 class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
@@ -116,8 +124,7 @@
                 </div>
             </div>
 
-            {{-- ▼▼▼ SEMUA MENU DI BAWAH INI HANYA UNTUK ADMIN ▼▼▼ --}}
-            @can('viewAny', \App\Models\User::class)
+            @can('viewAny', \App\Models\Report::class)
                 <a href="{{ route('admin.reports.index') }}"
                     class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
                     {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 font-semibold text-white' : 'text-blue-100 hover:bg-blue-600 hover:text-white' }}">
@@ -127,6 +134,13 @@
                     </svg>
                     <span class="ml-4 whitespace-nowrap">Laporan</span>
                 </a>
+            @endcan
+
+            @can('viewAny', \App\Models\User::class)
+                {{-- Judul Administrasi (Hanya Admin) --}}
+                <span
+                    class="px-4 pt-4 pb-1 block text-xs font-semibold uppercase text-blue-200 tracking-wider">Administrasi
+                    Situs</span>
 
                 <a href="{{ route('admin.coupons.index') }}"
                     class="flex items-center rounded-lg py-2 px-4 transition-colors duration-200 
@@ -174,7 +188,6 @@
                     </div>
                 </div>
             @endcan
-            {{-- ▲▲▲ AKHIR DARI MENU KHUSUS ADMIN ▲▲▲ --}}
         </nav>
     </div>
 </aside>
