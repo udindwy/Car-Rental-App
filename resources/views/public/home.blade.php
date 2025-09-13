@@ -9,4 +9,6 @@
     {{-- Memanggil komponen dari folder public dan mengirimkan datanya --}}
     <x-public.featured-vehicles :vehicles="$featuredVehicles" />
 
+    <x-public.testimonial-section :reviews="$reviews" />
+
 </x-public-layout>

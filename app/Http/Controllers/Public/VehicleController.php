@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Controller;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Vehicle;
-use Illuminate\Http\Request;
-use App\Services\PriceCalculatorService;
 use Carbon\Carbon;
+use App\Models\Brand;
+use App\Models\Review;
+use App\Models\Vehicle;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Services\PriceCalculatorService;
 
 class VehicleController extends Controller
 {
@@ -109,6 +110,14 @@ class VehicleController extends Controller
             ->take(6)
             ->get();
 
-        return view('public.home', compact('featuredVehicles'));
+        // Ambil 6 ulasan terbaru yang sudah disetujui (approved)
+        $reviews = Review::with('user')
+            ->where('approved', true)
+            ->latest()
+            ->take(6)
+            ->get();
+
+        // Kirim KEDUA variabel ke view
+        return view('public.home', compact('featuredVehicles', 'reviews'));
     }
 }
