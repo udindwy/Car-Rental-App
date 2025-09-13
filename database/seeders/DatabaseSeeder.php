@@ -32,6 +32,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
+            'name' => 'Staff User',
+            'email' => 'staff@example.com',
+            'role' => 'staff',
+        ]);
+
+        User::factory()->create([
             'name' => 'Customer User',
             'email' => 'customer@example.com',
             'role' => 'customer',
@@ -61,7 +67,7 @@ class DatabaseSeeder extends Seeder
         $bookingsToReview = Booking::where('status', 'completed')
             ->doesntHave('review')
             ->inRandomOrder()
-            ->limit(30) 
+            ->limit(30)
             ->get();
 
         // 3. Looping untuk membuat ulasan satu per satu untuk  setiap booking yang valid.

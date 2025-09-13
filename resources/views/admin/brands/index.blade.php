@@ -6,10 +6,12 @@
     <div class="p-6 bg-white rounded-lg shadow-lg">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-semibold text-gray-800">Daftar Brand Mobil</h2>
-            <a href="{{ route('admin.brands.create') }}"
-                class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
-                + Tambah Brand
-            </a>
+            @can('create', \App\Models\Brand::class)
+                <a href="{{ route('admin.brands.create') }}"
+                    class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
+                    + Tambah Brand
+                </a>
+            @endcan
         </div>
 
         @if (session('success'))
@@ -42,22 +44,23 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end space-x-2">
-                                    <!-- Tombol Edit -->
-                                    <a href="{{ route('admin.brands.edit', $brand) }}"
-                                        class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
-                                        Edit
-                                    </a>
-
-                                    <!-- Tombol Hapus -->
-                                    <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus brand ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                    @can('update', $brand)
+                                        <a href="{{ route('admin.brands.edit', $brand) }}"
+                                            class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 transition">
+                                            Edit
+                                        </a>
+                                    @endcan
+                                    @can('delete', $brand)
+                                        <form action="{{ route('admin.brands.destroy', $brand) }}" method="POST"
+                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus brand ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                class="px-3 py-1.5 rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700 transition">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

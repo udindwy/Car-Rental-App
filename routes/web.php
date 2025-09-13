@@ -92,6 +92,10 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])->prefix('admin')->na
     Route::post('vehicles/{vehicle}/blackouts', [VehicleController::class, 'storeBlackout'])->name('vehicles.blackouts.store');
     Route::delete('blackouts/{blackout}', [VehicleController::class, 'destroyBlackout'])->name('blackouts.destroy');
 
+    // ▼▼▼ RUTE BARU DITAMBAHKAN DI SINI ▼▼▼
+    Route::post('vehicles/{vehicle}/update-status', [VehicleController::class, 'updateStatus'])->name('vehicles.updateStatus');
+
+
     // Manajemen Transaksi
     Route::resource('bookings', BookingController::class);
     Route::get('bookings/{booking}/invoice', [BookingController::class, 'generateInvoice'])->name('bookings.invoice');

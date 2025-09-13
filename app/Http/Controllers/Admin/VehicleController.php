@@ -18,9 +18,11 @@ use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreVehicleRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class VehicleController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Menampilkan daftar semua kendaraan.
      */
@@ -197,5 +199,19 @@ class VehicleController extends Controller
             return redirect()->back()->with('import_errors', $e->failures());
         }
         return redirect()->back()->with('success', 'Data jadwal berhasil diimpor.');
+    }
+
+    public function updateStatus(Request $request, Vehicle $vehicle)
+    {
+        $this->authorize('updateStatus', $vehicle);
+
+        // Diubah: Validasi disesuaikan dengan nilai enum di database
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive,maintenance',
+        ]);
+
+        $vehicle->update(['status' => $validated['status']]);
+
+        return redirect()->back()->with('success', 'Status mobil berhasil diperbarui.');
     }
 }
