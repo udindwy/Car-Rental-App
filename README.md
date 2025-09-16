@@ -36,6 +36,11 @@ This is a web-based information system for a **Car Rental Business**, designed t
   * Review Management (moderation).
   * **User authentication with Laravel Breeze**, providing secure login, registration, and password management.
 
+* **Email & Notification System**
+
+  * **Mailtrap integration** for testing email notifications (e.g., booking confirmation, invoice, password reset) safely in development mode.
+  * Production-ready SMTP configuration for live deployment.
+
 * **Website Settings**
 
   * Admin can update basic website information such as Rental Name, Logo, Contact Info, and Social Media Links from the admin panel.
@@ -44,52 +49,18 @@ This is a web-based information system for a **Car Rental Business**, designed t
 
 ## 👥 User Roles
 
-### 1. Admin
-
-* Manage all website content and data (Fleet, Bookings, Users, Promotions, Pages, etc.).
-* Configure general website settings.
-* View all reports including revenue.
-* Full access to all features in the admin panel.
-
-### 2. Staff
-
-* Focus on daily operations.
-* Manage bookings (confirm, update rental status).
-* Manage car availability (maintenance schedules).
-* Verify manual payments.
-* Moderate customer reviews.
-* Limited access only to operational features.
-
-### 3. Customer
-
-* Browse car catalog and details.
-* Make bookings and online payments.
-* View booking history in personal dashboard.
-* Submit reviews for completed rentals.
-
-### 4. Visitor
-
-* Browse homepage, catalog, and car details.
-* Can register to become a customer.
+(sama seperti sebelumnya)
 
 ---
 
 ## 📦 System Workflow
 
-1. **Initial Setup**
-   Admin configures basic website information (name, contact) and inputs master data (brands, categories, cars, extras, coupons) via the **Admin Panel**.
-
-2. **Booking Process by Customer**
-   Customer selects a car from the **Catalog**, chooses dates and extras on the **Car Detail Page**, then fills in personal details and selects payment method on the **Checkout Page**.
+(sama seperti sebelumnya, dengan tambahan untuk email)
 
 3. **Payment & Confirmation**
 
-   * **Online Payment**: Customers pay via **Midtrans pop-up**. Once successful, booking status is automatically set to `confirmed`.
-   * **Manual Bank Transfer**: Customers receive instructions. *Staff* verifies payment and updates booking status manually in **Admin/Staff Dashboard**.
-   * **Pay on Delivery**: Booking is directly `confirmed`, and staff records payment when the car is picked up.
-
-4. **Staff Management**
-   *Staff* monitors new bookings, updates rental statuses (e.g., from `confirmed` to `on_rent`), and ensures car availability is accurate.
+   * Once booking is confirmed (via Midtrans or manual verification), the system automatically sends a **booking confirmation email** to the customer.
+   * During development, all outgoing emails are routed to **Mailtrap Inbox** for safe testing.
 
 ---
 
@@ -104,5 +75,4 @@ This is a web-based information system for a **Car Rental Business**, designed t
   * **AOS (Animate On Scroll)** (for animations)
 * **Database:** MySQL
 * **Payment:** Midtrans (Snap.js)
-
----
+* **Email:** Mailtrap (development), SMTP (production)
